@@ -16,6 +16,8 @@ public class Peter {
         System.out.println("      How am I saving you today?");
         System.out.println("     " + line);
 
+        String[] tasks = new String[100];
+        int taskCount = 0;
         //echo loop
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -28,8 +30,19 @@ public class Peter {
                 break;
             }
 
+            if(input.equals("list")) {
+                System.out.println("     " + line);
+                for (int i = 0; i < taskCount; i++) {
+                    System.out.println("     " + (i + 1) + ". " + tasks[i]);
+                }
+                System.out.println("     " + line);
+                continue;
+            }
+
+            tasks[taskCount] = input;
+            taskCount++;
             System.out.println("     " + line);
-            System.out.println("     " + input);
+            System.out.println("     added: " + input);
             System.out.println("     " + line);
         }
 
