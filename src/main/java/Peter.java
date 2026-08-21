@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Peter {
@@ -16,8 +17,7 @@ public class Peter {
         System.out.println("      How am I saving you today?");
         System.out.println("     " + line);
 
-        Task[] tasks = new Task[100];
-        int taskCount = 0;
+        ArrayList<Task> tasks = new ArrayList<>();
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
@@ -33,8 +33,8 @@ public class Peter {
             if (input.equals("list")) {
                 System.out.println("     " + line);
                 System.out.println("     Here are the tasks in your list:");
-                for (int i = 0; i < taskCount; i++) {
-                    System.out.println("     " + (i + 1) + "." + tasks[i]);
+                for (int i = 0; i < tasks.size(); i++) {
+                    System.out.println("     " + (i + 1) + "." + tasks.get(i));
                 }
                 System.out.println("     " + line);
                 continue;
@@ -42,28 +42,43 @@ public class Peter {
 
             if (input.equals("mark") || input.startsWith("mark ")) {
                 String arg = input.length() > 4 ? input.substring(4).trim() : "";
-                Integer index = parseTaskIndex(arg, taskCount, line);
+                Integer index = parseTaskIndex(arg, tasks.size(), line);
                 if (index == null) {
                     continue;
                 }
-                tasks[index].markAsDone();
+                tasks.get(index).markAsDone();
                 System.out.println("     " + line);
                 System.out.println("     Good job on completing:");
-                System.out.println("       " + tasks[index]);
+                System.out.println("       " + tasks.get(index));
                 System.out.println("     " + line);
                 continue;
             }
 
             if (input.equals("unmark") || input.startsWith("unmark ")) {
                 String arg = input.length() > 6 ? input.substring(6).trim() : "";
-                Integer index = parseTaskIndex(arg, taskCount, line);
+                Integer index = parseTaskIndex(arg, tasks.size(), line);
                 if (index == null) {
                     continue;
                 }
-                tasks[index].markAsNotDone();
+                tasks.get(index).markAsNotDone();
                 System.out.println("     " + line);
                 System.out.println("     OK, I've marked this task as not done yet:");
-                System.out.println("       " + tasks[index]);
+                System.out.println("       " + tasks.get(index));
+                System.out.println("     " + line);
+                continue;
+            }
+
+            if (input.equals("delete") || input.startsWith("delete ")) {
+                String arg = input.length() > 6 ? input.substring(6).trim() : "";
+                Integer index = parseTaskIndex(arg, tasks.size(), line);
+                if (index == null) {
+                    continue;
+                }
+                Task removed = tasks.remove((int) index);
+                System.out.println("     " + line);
+                System.out.println("     Noted. I've removed this task:");
+                System.out.println("       " + removed);
+                System.out.println("     Now you have " + tasks.size() + " tasks in the list.");
                 System.out.println("     " + line);
                 continue;
             }
@@ -74,9 +89,8 @@ public class Peter {
                     printError(line, "yea you're gonna have to give me more than that buddy.");
                     continue;
                 }
-                tasks[taskCount] = new Todo(description);
-                taskCount++;
-                printAdded(line, tasks[taskCount - 1], taskCount);
+                tasks.add(new Todo(description));
+                printAdded(line, tasks.get(tasks.size() - 1), tasks.size());
                 continue;
             }
 
@@ -93,9 +107,8 @@ public class Peter {
                     printError(line, "yea you're gonna have to give me more than that buddy.");
                     continue;
                 }
-                tasks[taskCount] = new Deadline(description, by);
-                taskCount++;
-                printAdded(line, tasks[taskCount - 1], taskCount);
+                tasks.add(new Deadline(description, by));
+                printAdded(line, tasks.get(tasks.size() - 1), tasks.size());
                 continue;
             }
 
@@ -114,9 +127,8 @@ public class Peter {
                     printError(line, "yea you're gonna have to give me more than that buddy.");
                     continue;
                 }
-                tasks[taskCount] = new Event(description, from, to);
-                taskCount++;
-                printAdded(line, tasks[taskCount - 1], taskCount);
+                tasks.add(new Event(description, from, to));
+                printAdded(line, tasks.get(tasks.size() - 1), tasks.size());
                 continue;
             }
 
