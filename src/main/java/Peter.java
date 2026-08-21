@@ -5,10 +5,10 @@ public class Peter {
     public static void main(String[] args) {
         String line = "____________________________________________________________";
         String banner = "       ____       _            \n"
-                + "      |  _ \\ ___ | |_ ___ _ __ \n"
-                + "      | |_) / _ \\| __/ _ \\ '__|\n"
-                + "      |  __/  __/| ||  __/ |   \n"
-                + "      |_|   \\___| \\__\\___|_|   \n";
+                      + "      |  _ \\ ___ | |_ ___ _ __ \n"
+                      + "      | |_) / _ \\| __/ _ \\ '__|\n"
+                      + "      |  __/  __/| ||  __/ |   \n"
+                      + "      |_|   \\___| \\__\\___|_|   \n";
 
         //greetings
         System.out.println("     " + line);
@@ -23,119 +23,110 @@ public class Peter {
         while (true) {
             String input = scanner.nextLine().trim();
 
-            if (input.equals("bye")) {
-                System.out.println("     " + line);
-                System.out.println("     Bye! See you next time.");
-                System.out.println("     " + line);
-                break;
-            }
+            String keyword = input.split(" ", 2)[0];
+            String argsRest = input.length() > keyword.length() ? input.substring(keyword.length()).trim() : "";
+            Command command = Command.fromKeyword(keyword);
 
-            if (input.equals("list")) {
-                System.out.println("     " + line);
-                System.out.println("     Here are the tasks in your list:");
-                for (int i = 0; i < tasks.size(); i++) {
-                    System.out.println("     " + (i + 1) + "." + tasks.get(i));
-                }
-                System.out.println("     " + line);
-                continue;
-            }
+            switch (command) {
+                case BYE:
+                    System.out.println("     " + line);
+                    System.out.println("     Bye! See you next time.");
+                    System.out.println("     " + line);
+                    scanner.close();
+                    return;
 
-            if (input.equals("mark") || input.startsWith("mark ")) {
-                String arg = input.length() > 4 ? input.substring(4).trim() : "";
-                Integer index = parseTaskIndex(arg, tasks.size(), line);
-                if (index == null) {
-                    continue;
-                }
-                tasks.get(index).markAsDone();
-                System.out.println("     " + line);
-                System.out.println("     Good job on completing:");
-                System.out.println("       " + tasks.get(index));
-                System.out.println("     " + line);
-                continue;
-            }
+                case LIST:
+                    System.out.println("     " + line);
+                    System.out.println("     Here are the tasks in your list:");
+                    for (int i = 0; i < tasks.size(); i++) {
+                        System.out.println("     " + (i + 1) + "." + tasks.get(i));
+                    }
+                    System.out.println("     " + line);
+                    break;
 
-            if (input.equals("unmark") || input.startsWith("unmark ")) {
-                String arg = input.length() > 6 ? input.substring(6).trim() : "";
-                Integer index = parseTaskIndex(arg, tasks.size(), line);
-                if (index == null) {
-                    continue;
+                case MARK: {
+                    Integer index = parseTaskIndex(argsRest, tasks.size(), line);
+                    if (index == null) break;
+                    tasks.get(index).markAsDone();
+                    System.out.println("     " + line);
+                    System.out.println("     Good job on completing:");
+                    System.out.println("       " + tasks.get(index));
+                    System.out.println("     " + line);
+                    break;
                 }
-                tasks.get(index).markAsNotDone();
-                System.out.println("     " + line);
-                System.out.println("     OK, I've marked this task as not done yet:");
-                System.out.println("       " + tasks.get(index));
-                System.out.println("     " + line);
-                continue;
-            }
 
-            if (input.equals("delete") || input.startsWith("delete ")) {
-                String arg = input.length() > 6 ? input.substring(6).trim() : "";
-                Integer index = parseTaskIndex(arg, tasks.size(), line);
-                if (index == null) {
-                    continue;
+                case UNMARK: {
+                    Integer index = parseTaskIndex(argsRest, tasks.size(), line);
+                    if (index == null) break;
+                    tasks.get(index).markAsNotDone();
+                    System.out.println("     " + line);
+                    System.out.println("     OK, I've marked this task as not done yet:");
+                    System.out.println("       " + tasks.get(index));
+                    System.out.println("     " + line);
+                    break;
                 }
-                Task removed = tasks.remove((int) index);
-                System.out.println("     " + line);
-                System.out.println("     Noted. I've removed this task:");
-                System.out.println("       " + removed);
-                System.out.println("     Now you have " + tasks.size() + " tasks in the list.");
-                System.out.println("     " + line);
-                continue;
-            }
 
-            if (input.equals("todo") || input.startsWith("todo ")) {
-                String description = input.length() > 4 ? input.substring(4).trim() : "";
-                if (description.isEmpty()) {
-                    printError(line, "yea you're gonna have to give me more than that buddy.");
-                    continue;
+                case DELETE: {
+                    Integer index = parseTaskIndex(argsRest, tasks.size(), line);
+                    if (index == null) break;
+                    Task removed = tasks.remove((int) index);
+                    System.out.println("     " + line);
+                    System.out.println("     Noted. I've removed this task:");
+                    System.out.println("       " + removed);
+                    System.out.println("     Now you have " + tasks.size() + " tasks in the list.");
+                    System.out.println("     " + line);
+                    break;
                 }
-                tasks.add(new Todo(description));
-                printAdded(line, tasks.get(tasks.size() - 1), tasks.size());
-                continue;
-            }
 
-            if (input.equals("deadline") || input.startsWith("deadline ")) {
-                String rest = input.length() > 8 ? input.substring(8).trim() : "";
-                if (rest.isEmpty() || !rest.contains("/by")) {
-                    printError(line, "yea you're gonna have to give me more than that buddy.");
-                    continue;
-                }
-                String[] parts = rest.split("/by", 2);
-                String description = parts[0].trim();
-                String by = parts[1].trim();
-                if (description.isEmpty() || by.isEmpty()) {
-                    printError(line, "yea you're gonna have to give me more than that buddy.");
-                    continue;
-                }
-                tasks.add(new Deadline(description, by));
-                printAdded(line, tasks.get(tasks.size() - 1), tasks.size());
-                continue;
-            }
+                case TODO:
+                    if (argsRest.isEmpty()) {
+                        printError(line, "yea you're gonna have to give me more than that buddy.");
+                        break;
+                    }
+                    tasks.add(new Todo(argsRest));
+                    printAdded(line, tasks.get(tasks.size() - 1), tasks.size());
+                    break;
 
-            if (input.equals("event") || input.startsWith("event ")) {
-                String rest = input.length() > 5 ? input.substring(5).trim() : "";
-                if (rest.isEmpty() || !rest.contains("/from") || !rest.contains("/to")) {
-                    printError(line, "yea you're gonna have to give me more than that buddy.");
-                    continue;
+                case DEADLINE: {
+                    if (argsRest.isEmpty() || !argsRest.contains("/by")) {
+                        printError(line, "yea you're gonna have to give me more than that buddy.");
+                        break;
+                    }
+                    String[] parts = argsRest.split("/by", 2);
+                    String description = parts[0].trim();
+                    String by = parts[1].trim();
+                    if (description.isEmpty() || by.isEmpty()) {
+                        printError(line, "yea you're gonna have to give me more than that buddy.");
+                        break;
+                    }
+                    tasks.add(new Deadline(description, by));
+                    printAdded(line, tasks.get(tasks.size() - 1), tasks.size());
+                    break;
                 }
-                String[] fromSplit = rest.split("/from", 2);
-                String description = fromSplit[0].trim();
-                String[] toSplit = fromSplit[1].split("/to", 2);
-                String from = toSplit[0].trim();
-                String to = toSplit.length > 1 ? toSplit[1].trim() : "";
-                if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
-                    printError(line, "yea you're gonna have to give me more than that buddy.");
-                    continue;
-                }
-                tasks.add(new Event(description, from, to));
-                printAdded(line, tasks.get(tasks.size() - 1), tasks.size());
-                continue;
-            }
 
-            printError(line, "I can't recognise that cus im not that developed yet, maybe next time");
+                case EVENT: {
+                    if (argsRest.isEmpty() || !argsRest.contains("/from") || !argsRest.contains("/to")) {
+                        printError(line, "yea you're gonna have to give me more than that buddy.");
+                        break;
+                    }
+                    String[] fromSplit = argsRest.split("/from", 2);
+                    String description = fromSplit[0].trim();
+                    String[] toSplit = fromSplit[1].split("/to", 2);
+                    String from = toSplit[0].trim();
+                    String to = toSplit.length > 1 ? toSplit[1].trim() : "";
+                    if (description.isEmpty() || from.isEmpty() || to.isEmpty()) {
+                        printError(line, "yea you're gonna have to give me more than that buddy.");
+                        break;
+                    }
+                    tasks.add(new Event(description, from, to));
+                    printAdded(line, tasks.get(tasks.size() - 1), tasks.size());
+                    break;
+                }
+
+                default:
+                    printError(line, "I can't recognise that cus im not that developed yet, maybe next time");
+            }
         }
-
-        scanner.close();
     }
 
     private static Integer parseTaskIndex(String arg, int taskCount, String line) {
