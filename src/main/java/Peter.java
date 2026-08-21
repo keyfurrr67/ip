@@ -17,6 +17,7 @@ public class Peter {
         System.out.println("      How am I saving you today?");
         System.out.println("     " + line);
 
+        //storing for list
         ArrayList<Task> tasks = new ArrayList<>();
 
         Scanner scanner = new Scanner(System.in);
@@ -27,6 +28,7 @@ public class Peter {
             String argsRest = input.length() > keyword.length() ? input.substring(keyword.length()).trim() : "";
             Command command = Command.fromKeyword(keyword);
 
+            //different commands given by user
             switch (command) {
                 case BYE:
                     System.out.println("     " + line);
@@ -35,6 +37,7 @@ public class Peter {
                     scanner.close();
                     return;
 
+                //list out full list
                 case LIST:
                     System.out.println("     " + line);
                     System.out.println("     Here are the tasks in your list:");
@@ -44,6 +47,7 @@ public class Peter {
                     System.out.println("     " + line);
                     break;
 
+                //user chooses activity to be marked as done
                 case MARK: {
                     Integer index = parseTaskIndex(argsRest, tasks.size(), line);
                     if (index == null) break;
@@ -55,6 +59,7 @@ public class Peter {
                     break;
                 }
 
+                //user chooses to undo an activity
                 case UNMARK: {
                     Integer index = parseTaskIndex(argsRest, tasks.size(), line);
                     if (index == null) break;
@@ -66,6 +71,7 @@ public class Peter {
                     break;
                 }
 
+                //completely remove an item from the list
                 case DELETE: {
                     Integer index = parseTaskIndex(argsRest, tasks.size(), line);
                     if (index == null) break;
@@ -78,6 +84,7 @@ public class Peter {
                     break;
                 }
 
+                //add an activity to do
                 case TODO:
                     if (argsRest.isEmpty()) {
                         printError(line, "yea you're gonna have to give me more than that buddy.");
@@ -87,6 +94,7 @@ public class Peter {
                     printAdded(line, tasks.get(tasks.size() - 1), tasks.size());
                     break;
 
+                //add an activity with a deadline in the format deadline xxx /by xxx
                 case DEADLINE: {
                     if (argsRest.isEmpty() || !argsRest.contains("/by")) {
                         printError(line, "yea you're gonna have to give me more than that buddy.");
@@ -104,6 +112,7 @@ public class Peter {
                     break;
                 }
 
+                //add an activity in the format event xxx /from xxx /to xxx
                 case EVENT: {
                     if (argsRest.isEmpty() || !argsRest.contains("/from") || !argsRest.contains("/to")) {
                         printError(line, "yea you're gonna have to give me more than that buddy.");
@@ -122,13 +131,13 @@ public class Peter {
                     printAdded(line, tasks.get(tasks.size() - 1), tasks.size());
                     break;
                 }
-
+                //unknown commands not specified in switch
                 default:
                     printError(line, "I can't recognise that cus im not that developed yet, maybe next time");
             }
         }
     }
-
+    //error handling for list
     private static Integer parseTaskIndex(String arg, int taskCount, String line) {
         if (arg.isEmpty()) {
             printError(line, "yea you're gonna have to give me more than that buddy.");
