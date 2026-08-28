@@ -2,7 +2,7 @@
  * Lists the commands understood by Peter.
  */
 public enum Command {
-    BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, UNKNOWN;
+    BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, ON, UNKNOWN;
 
     /**
      * Converts a command keyword into its matching command value.
@@ -13,7 +13,7 @@ public enum Command {
     public static Command fromKeyword(String keyword) {
         try {
             return Command.valueOf(keyword.toUpperCase());
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException exception) {
             return UNKNOWN;
         }
     }
