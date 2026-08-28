@@ -34,8 +34,9 @@ public class Storage {
      * Loads all valid tasks from the data file.
      *
      * @return the tasks successfully loaded from disk
+     * @throws PeterException if the data file or its directory cannot be read
      */
-    public ArrayList<Task> load() {
+    public ArrayList<Task> load() throws PeterException {
         ArrayList<Task> loadedTasks = new ArrayList<>();
         try {
             ensureDataFileExists();
@@ -47,7 +48,7 @@ public class Storage {
                 }
             }
         } catch (IOException exception) {
-            System.out.println("     Peter couldn't open the old notes, so he's starting fresh.");
+            throw new PeterException("Peter couldn't open the old notes, so he's starting fresh.");
         }
         return loadedTasks;
     }
@@ -126,28 +127,28 @@ public class Storage {
      */
     private Task createTask(String[] parts, String originalLine) {
         switch (parts[0]) {
-        case TODO_TYPE:
-            if (parts.length != 3) {
+            case TODO_TYPE:
+                if (parts.length != 3) {
+                    printSkippedLineWarning(originalLine);
+                    return null;
+                }
+                return new Todo(parts[2]);
+            case DEADLINE_TYPE:
+                if (parts.length != 4 || parts[3].isEmpty()) {
+                    printSkippedLineWarning(originalLine);
+                    return null;
+                }
+                return new Deadline(parts[2], parseStoredDateTime(parts[3]));
+            case EVENT_TYPE:
+                if (parts.length != 5 || parts[3].isEmpty() || parts[4].isEmpty()) {
+                    printSkippedLineWarning(originalLine);
+                    return null;
+                }
+                return new Event(parts[2], parseStoredDateTime(parts[3]),
+                        parseStoredDateTime(parts[4]));
+            default:
                 printSkippedLineWarning(originalLine);
                 return null;
-            }
-            return new Todo(parts[2]);
-        case DEADLINE_TYPE:
-            if (parts.length != 4 || parts[3].isEmpty()) {
-                printSkippedLineWarning(originalLine);
-                return null;
-            }
-            return new Deadline(parts[2], parseStoredDateTime(parts[3]));
-        case EVENT_TYPE:
-            if (parts.length != 5 || parts[3].isEmpty() || parts[4].isEmpty()) {
-                printSkippedLineWarning(originalLine);
-                return null;
-            }
-            return new Event(parts[2], parseStoredDateTime(parts[3]),
-                    parseStoredDateTime(parts[4]));
-        default:
-            printSkippedLineWarning(originalLine);
-            return null;
         }
     }
 
