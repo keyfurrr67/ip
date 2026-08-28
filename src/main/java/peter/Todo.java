@@ -14,16 +14,6 @@ public class Todo extends Task {
     }
 
     /**
-     * Returns this todo in the format used by Peter's storage file.
-     *
-     * @return the todo's pipe-delimited storage representation
-     */
-    @Override
-    public String toFileFormat() {
-        return "T | " + (isDone ? "1" : "0") + " | " + description;
-    }
-
-    /**
      * Returns this todo in Peter's normal display format.
      *
      * @return the formatted todo
