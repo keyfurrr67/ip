@@ -4,6 +4,8 @@ package peter;
  * Represents a task in Peter's task list.
  */
 public class Task {
+    public static final String DONE_MARKER = "1";
+    public static final String NOT_DONE_MARKER = "0";
     protected String description;
     protected boolean isDone;
 
@@ -51,7 +53,7 @@ public class Task {
      * @return the task's pipe-delimited storage representation
      */
     public String toFileFormat() {
-        return "T | " + (isDone ? "1" : "0") + " | " + description;
+        return "T | " + (isDone ? DONE_MARKER : NOT_DONE_MARKER) + " | " + description;
     }
 
     /**

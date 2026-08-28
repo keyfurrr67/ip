@@ -110,7 +110,7 @@ public class Storage {
             if (task == null) {
                 return null;
             }
-            if (parts[1].equals("1")) {
+            if (parts[1].equals(Task.DONE_MARKER)) {
                 task.markAsDone();
             }
             return task;
@@ -173,7 +173,7 @@ public class Storage {
      * @return true if the status is either 0 or 1
      */
     private boolean isValidStatus(String status) {
-        return status.equals("0") || status.equals("1");
+        return status.equals(Task.NOT_DONE_MARKER) || status.equals(Task.DONE_MARKER);
     }
 
     /**

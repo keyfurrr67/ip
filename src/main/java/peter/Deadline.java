@@ -45,7 +45,7 @@ public class Deadline extends Task {
      */
     @Override
     public String toFileFormat() {
-        return "D | " + (isDone ? "1" : "0") + " | " + description + " | "
+        return "D | " + (isDone ? DONE_MARKER : NOT_DONE_MARKER) + " | " + description + " | "
                 + by.format(STORAGE_DATE_FORMAT);
     }
 

@@ -48,7 +48,7 @@ public class Event extends Task {
      */
     @Override
     public String toFileFormat() {
-        return "E | " + (isDone ? "1" : "0") + " | " + description
+        return "E | " + (isDone ? DONE_MARKER : NOT_DONE_MARKER) + " | " + description
                 + " | " + from.format(STORAGE_DATE_FORMAT) + " | " + to.format(STORAGE_DATE_FORMAT);
     }
 
