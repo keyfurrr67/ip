@@ -1,3 +1,5 @@
+package peter;
+
 /**
  * Represents a task in Peter's task list.
  */

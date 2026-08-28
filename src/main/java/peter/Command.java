@@ -1,3 +1,5 @@
+package peter;
+
 /**
  * Lists the commands understood by Peter.
  */

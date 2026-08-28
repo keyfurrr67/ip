@@ -1,3 +1,5 @@
+package peter;
+
 /**
  * Represents an error specific to Peter's command handling, such as invalid
  * command syntax, an out-of-range task index, a malformed date, or a
