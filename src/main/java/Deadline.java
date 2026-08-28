@@ -1,18 +1,39 @@
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 /**
- * Represents a task that should be completed by a specified time.
+ * Represents a task that should be completed by a specified date and time.
  */
 public class Deadline extends Task {
-    protected String by;
+    private static final DateTimeFormatter OUTPUT_DATE_TIME_FORMAT =
+            DateTimeFormatter.ofPattern("MMM dd yyyy, h:mma", Locale.ENGLISH);
+    private static final DateTimeFormatter OUTPUT_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter STORAGE_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm");
+
+    protected LocalDateTime by;
 
     /**
      * Creates an incomplete deadline task.
      *
      * @param description the deadline description
-     * @param by the deadline time or date
+     * @param by the deadline date and time
      */
-    public Deadline(String description, String by) {
+    public Deadline(String description, LocalDateTime by) {
         super(description);
         this.by = by;
+    }
+
+    /**
+     * Returns the deadline date and time.
+     *
+     * @return the deadline date and time
+     */
+    public LocalDateTime getBy() {
+        return by;
     }
 
     /**
@@ -22,7 +43,8 @@ public class Deadline extends Task {
      */
     @Override
     public String toFileFormat() {
-        return "D | " + (isDone ? "1" : "0") + " | " + description + " | " + by;
+        return "D | " + (isDone ? "1" : "0") + " | " + description + " | "
+                + by.format(STORAGE_DATE_FORMAT);
     }
 
     /**
@@ -32,6 +54,19 @@ public class Deadline extends Task {
      */
     @Override
     public String toString() {
-        return "[D]" + super.toString() + " (by: " + by + ")";
+        return "[D]" + super.toString() + " (by: " + formatDateTime(by) + ")";
+    }
+
+    /**
+     * Formats a date and time for display without showing midnight unnecessarily.
+     *
+     * @param dateTime the date and time to format
+     * @return the formatted date, with time when it is not midnight
+     */
+    private String formatDateTime(LocalDateTime dateTime) {
+        if (dateTime.toLocalTime().equals(LocalTime.MIDNIGHT)) {
+            return dateTime.format(OUTPUT_DATE_FORMAT);
+        }
+        return dateTime.format(OUTPUT_DATE_TIME_FORMAT);
     }
 }

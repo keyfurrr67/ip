@@ -1,21 +1,42 @@
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
 /**
- * Represents a task that occurs during a specified time period.
+ * Represents a task that occurs during a specified period.
  */
 public class Event extends Task {
-    protected String from;
-    protected String to;
+    private static final DateTimeFormatter OUTPUT_DATE_TIME_FORMAT =
+            DateTimeFormatter.ofPattern("MMM dd yyyy, h:mma", Locale.ENGLISH);
+    private static final DateTimeFormatter OUTPUT_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("MMM dd yyyy", Locale.ENGLISH);
+    private static final DateTimeFormatter STORAGE_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm");
+
+    protected LocalDateTime from;
+    protected LocalDateTime to;
 
     /**
      * Creates an incomplete event task.
      *
      * @param description the event description
-     * @param from the event start time or date
-     * @param to the event end time or date
+     * @param from the event start date and time
+     * @param to the event end date and time
      */
-    public Event(String description, String from, String to) {
+    public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
         this.from = from;
         this.to = to;
+    }
+
+    /**
+     * Returns the event start date and time.
+     *
+     * @return the event start date and time
+     */
+    public LocalDateTime getFrom() {
+        return from;
     }
 
     /**
@@ -26,7 +47,7 @@ public class Event extends Task {
     @Override
     public String toFileFormat() {
         return "E | " + (isDone ? "1" : "0") + " | " + description
-                + " | " + from + " | " + to;
+                + " | " + from.format(STORAGE_DATE_FORMAT) + " | " + to.format(STORAGE_DATE_FORMAT);
     }
 
     /**
@@ -36,6 +57,20 @@ public class Event extends Task {
      */
     @Override
     public String toString() {
-        return "[E]" + super.toString() + " (from: " + from + " to: " + to + ")";
+        return "[E]" + super.toString() + " (from: " + formatDateTime(from)
+                + " to: " + formatDateTime(to) + ")";
+    }
+
+    /**
+     * Formats a date and time for display without showing midnight unnecessarily.
+     *
+     * @param dateTime the date and time to format
+     * @return the formatted date, with time when it is not midnight
+     */
+    private String formatDateTime(LocalDateTime dateTime) {
+        if (dateTime.toLocalTime().equals(LocalTime.MIDNIGHT)) {
+            return dateTime.format(OUTPUT_DATE_FORMAT);
+        }
+        return dateTime.format(OUTPUT_DATE_TIME_FORMAT);
     }
 }
