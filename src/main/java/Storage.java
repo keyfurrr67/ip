@@ -3,6 +3,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +16,8 @@ public class Storage {
     private static final String TODO_TYPE = "T";
     private static final String DEADLINE_TYPE = "D";
     private static final String EVENT_TYPE = "E";
+    private static final DateTimeFormatter STORAGE_DATE_FORMAT =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm");
 
     private final Path filePath;
 
@@ -26,18 +31,15 @@ public class Storage {
     }
 
     /**
-     * Loads all valid tasks from the data file. Malformed lines are skipped so
-     * that one bad entry does not prevent the remaining tasks from loading.
+     * Loads all valid tasks from the data file.
      *
      * @return the tasks successfully loaded from disk
      */
     public ArrayList<Task> load() {
         ArrayList<Task> loadedTasks = new ArrayList<>();
-
         try {
             ensureDataFileExists();
             List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
-
             for (String line : lines) {
                 Task task = parseTask(line);
                 if (task != null) {
@@ -47,7 +49,6 @@ public class Storage {
         } catch (IOException exception) {
             System.out.println("     Peter couldn't open the old notes, so he's starting fresh.");
         }
-
         return loadedTasks;
     }
 
@@ -58,11 +59,9 @@ public class Storage {
      */
     public void save(ArrayList<Task> tasks) {
         ArrayList<String> taskLines = new ArrayList<>();
-
         for (Task task : tasks) {
             taskLines.add(task.toFileFormat());
         }
-
         try {
             ensureDataFileExists();
             Files.write(filePath, taskLines, StandardCharsets.UTF_8,
@@ -79,11 +78,9 @@ public class Storage {
      */
     private void ensureDataFileExists() throws IOException {
         Path parentDirectory = filePath.getParent();
-
         if (parentDirectory != null) {
             Files.createDirectories(parentDirectory);
         }
-
         if (Files.notExists(filePath)) {
             Files.createFile(filePath);
         }
@@ -97,50 +94,73 @@ public class Storage {
      */
     private Task parseTask(String line) {
         String[] parts = line.split("\\|", -1);
-
         for (int index = 0; index < parts.length; index++) {
             parts[index] = parts[index].trim();
         }
-
         if (parts.length < 3 || !isValidStatus(parts[1]) || parts[2].isEmpty()) {
             printSkippedLineWarning(line);
             return null;
         }
 
-        Task task;
-
-        switch (parts[0]) {
-        case TODO_TYPE:
-            if (parts.length != 3) {
-                printSkippedLineWarning(line);
+        try {
+            Task task = createTask(parts, line);
+            if (task == null) {
                 return null;
             }
-            task = new Todo(parts[2]);
-            break;
-        case DEADLINE_TYPE:
-            if (parts.length != 4 || parts[3].isEmpty()) {
-                printSkippedLineWarning(line);
-                return null;
+            if (parts[1].equals("1")) {
+                task.markAsDone();
             }
-            task = new Deadline(parts[2], parts[3]);
-            break;
-        case EVENT_TYPE:
-            if (parts.length != 5 || parts[3].isEmpty() || parts[4].isEmpty()) {
-                printSkippedLineWarning(line);
-                return null;
-            }
-            task = new Event(parts[2], parts[3], parts[4]);
-            break;
-        default:
+            return task;
+        } catch (DateTimeParseException exception) {
             printSkippedLineWarning(line);
             return null;
         }
+    }
 
-        if (parts[1].equals("1")) {
-            task.markAsDone();
+    /**
+     * Creates a task from split storage fields.
+     *
+     * @param parts the split and trimmed storage fields
+     * @param originalLine the original line, used when printing warnings
+     * @return the reconstructed task, or {@code null} when its structure is invalid
+     */
+    private Task createTask(String[] parts, String originalLine) {
+        switch (parts[0]) {
+        case TODO_TYPE:
+            if (parts.length != 3) {
+                printSkippedLineWarning(originalLine);
+                return null;
+            }
+            return new Todo(parts[2]);
+        case DEADLINE_TYPE:
+            if (parts.length != 4 || parts[3].isEmpty()) {
+                printSkippedLineWarning(originalLine);
+                return null;
+            }
+            return new Deadline(parts[2], parseStoredDateTime(parts[3]));
+        case EVENT_TYPE:
+            if (parts.length != 5 || parts[3].isEmpty() || parts[4].isEmpty()) {
+                printSkippedLineWarning(originalLine);
+                return null;
+            }
+            return new Event(parts[2], parseStoredDateTime(parts[3]),
+                    parseStoredDateTime(parts[4]));
+        default:
+            printSkippedLineWarning(originalLine);
+            return null;
         }
+    }
 
-        return task;
+    /**
+     * Parses a saved ISO-style date and time.
+     *
+     * @param storedDateTime the saved date and time text
+     * @return the parsed date and time
+     * @throws DateTimeParseException if the saved value is invalid
+     */
+    private LocalDateTime parseStoredDateTime(String storedDateTime)
+            throws DateTimeParseException {
+        return LocalDateTime.parse(storedDateTime, STORAGE_DATE_FORMAT);
     }
 
     /**
@@ -160,6 +180,6 @@ public class Storage {
      */
     private void printSkippedLineWarning(String line) {
         System.out.println("     Peter found a scribbled-on line he couldn't read: \""
-                + line + "\" — skipping it.");
+                + line + "\" - skipping it.");
     }
 }
