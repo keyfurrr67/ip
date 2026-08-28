@@ -86,6 +86,20 @@ public class Parser {
     }
 
     /**
+     * Parses the keyword used by the {@code find} command.
+     *
+     * @param arguments the search keyword entered by the user
+     * @return the trimmed keyword
+     * @throws PeterException if the keyword is empty
+     */
+    public static String parseFindKeyword(String arguments) throws PeterException {
+        if (arguments.isEmpty()) {
+            throw new PeterException("yea you're gonna have to give me more than that buddy.");
+        }
+        return arguments;
+    }
+
+    /**
      * Parses arguments for a deadline command in the form
      * {@code <description> /by <date/time>}.
      *

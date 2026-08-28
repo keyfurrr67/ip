@@ -121,6 +121,22 @@ public class TaskList {
     }
 
     /**
+     * Returns the tasks whose description contains the given keyword.
+     *
+     * @param keyword the search term to match against task descriptions
+     * @return the matching tasks
+     */
+    public List<Task> findTasks(String keyword) {
+        List<Task> matchingTasks = new ArrayList<>();
+        for (Task task : tasks) {
+            if (task.getDescription().contains(keyword)) {
+                matchingTasks.add(task);
+            }
+        }
+        return matchingTasks;
+    }
+
+    /**
      * Checks that a zero-based index refers to an existing task.
      *
      * @param index the zero-based task index

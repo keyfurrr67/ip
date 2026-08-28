@@ -108,6 +108,11 @@ public class Peter {
                 ui.showTasksOnDate(tasks.getTasksOnDate(requestedDate), requestedDate);
                 break;
             }
+            case FIND: {
+                String keyword = Parser.parseFindKeyword(arguments);
+                ui.showFoundTasks(tasks.findTasks(keyword));
+                break;
+            }
             default:
                 throw new PeterException("I can't recognise that cus im not that developed yet, maybe next time");
         }

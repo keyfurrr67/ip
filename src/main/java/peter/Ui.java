@@ -160,6 +160,24 @@ public class Ui {
     }
 
     /**
+     * Prints tasks matching a search keyword.
+     *
+     * @param matchingTasks the tasks that matched the search
+     */
+    public void showFoundTasks(List<Task> matchingTasks) {
+        System.out.println("     " + DIVIDER);
+        if (matchingTasks.isEmpty()) {
+            System.out.println("     Peter searched high and low but found nothing matching that.");
+        } else {
+            System.out.println("     Here's what Peter dug up matching that:");
+            for (int index = 0; index < matchingTasks.size(); index++) {
+                System.out.println("     " + (index + 1) + "." + matchingTasks.get(index));
+            }
+        }
+        System.out.println("     " + DIVIDER);
+    }
+
+    /**
      * Prints a boxed error message in Peter's usual style.
      *
      * @param message the error message to display
