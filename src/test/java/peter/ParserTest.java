@@ -97,20 +97,17 @@ public class ParserTest {
 
     @Test
     public void parseEvent_missingFromKeyword_throwsPeterException() {
-        assertThrows(PeterException.class,
-                () -> Parser.parseEvent("project meeting /to 2019-12-02 1600"));
+        assertThrows(PeterException.class, () -> Parser.parseEvent("project meeting /to 2019-12-02 1600"));
     }
 
     @Test
     public void parseEvent_missingToKeyword_throwsPeterException() {
-        assertThrows(PeterException.class,
-                () -> Parser.parseEvent("project meeting /from 2019-12-02 1400"));
+        assertThrows(PeterException.class, () -> Parser.parseEvent("project meeting /from 2019-12-02 1400"));
     }
 
     @Test
     public void parseEvent_emptyToValue_throwsPeterException() {
-        assertThrows(PeterException.class,
-                () -> Parser.parseEvent("project meeting /from 2019-12-02 1400 /to"));
+        assertThrows(PeterException.class, () -> Parser.parseEvent("project meeting /from 2019-12-02 1400 /to"));
     }
 
     @Test
