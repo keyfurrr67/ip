@@ -16,8 +16,8 @@ public class Event extends Task {
     private static final DateTimeFormatter STORAGE_DATE_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm");
 
-    protected LocalDateTime from;
-    protected LocalDateTime to;
+    private final LocalDateTime from;
+    private final LocalDateTime to;
 
     /**
      * Creates an incomplete event task.

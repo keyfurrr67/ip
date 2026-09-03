@@ -16,7 +16,7 @@ public class Deadline extends Task {
     private static final DateTimeFormatter STORAGE_DATE_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm");
 
-    protected LocalDateTime by;
+    private final LocalDateTime by;
 
     /**
      * Creates an incomplete deadline task.
