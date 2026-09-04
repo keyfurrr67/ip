@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Handles all interaction with the user: reading input and printing output.
+ * Builds Peter's response text for user-facing events, and reads console
+ * input for the command-line entry point. Contains no formatting for visual
+ * borders, so the same text can be shown in the console or in the GUI.
  */
 public class Ui {
-    private static final String DIVIDER = "____________________________________________________________";
     private static final String BANNER = "       ____       _            \n"
             + "      |  _ \\ ___ | |_ ___ _ __ \n"
             + "      | |_) / _ \\| __/ _ \\ '__|\n"
@@ -36,155 +37,136 @@ public class Ui {
         scanner.close();
     }
 
-    /** Prints Peter's greeting banner. */
-    public void showWelcome() {
-        System.out.println("     " + DIVIDER);
-        System.out.print(BANNER);
-        System.out.println("      My name is Peter");
-        System.out.println("      How am I saving you today?");
-        System.out.println("     " + DIVIDER);
-    }
-
-    /** Prints Peter's farewell message. */
-    public void showGoodbye() {
-        System.out.println("     " + DIVIDER);
-        System.out.println("     Bye! See you next time.");
-        System.out.println("     " + DIVIDER);
+    /**
+     * Returns Peter's greeting banner.
+     *
+     * @return the greeting message
+     */
+    public String showWelcome() {
+        return BANNER + "My name is Peter\nHow am I saving you today?";
     }
 
     /**
-     * Prints Peter's message about tasks recovered from storage.
+     * Returns Peter's farewell message.
+     *
+     * @return the farewell message
+     */
+    public String showGoodbye() {
+        return "Bye! See you next time.";
+    }
+
+    /**
+     * Returns Peter's message about tasks recovered from storage.
      *
      * @param taskCount the number of tasks loaded from disk
+     * @return the loading result message
      */
-    public void showLoadingResult(int taskCount) {
-        System.out.println("     " + DIVIDER);
+    public String showLoadingResult(int taskCount) {
         if (taskCount == 0) {
-            System.out.println("     Peter dug around but found nothing - starting a fresh list.");
-        } else {
-            System.out.println("     Peter dug up " + taskCount + " task(s) from your old notes.");
+            return "Peter dug around but found nothing - starting a fresh list.";
         }
-        System.out.println("     " + DIVIDER);
-    }
-
-    /** Prints Peter's message for when saved tasks could not be loaded. */
-    public void showLoadingError() {
-        System.out.println("     " + DIVIDER);
-        System.out.println("     Peter couldn't open the old notes, so he's starting fresh.");
-        System.out.println("     " + DIVIDER);
+        return "Peter dug up " + taskCount + " task(s) from your old notes.";
     }
 
     /**
-     * Prints all tasks in the current task list.
+     * Returns Peter's message for when saved tasks could not be loaded.
+     *
+     * @return the loading error message
+     */
+    public String showLoadingError() {
+        return "Peter couldn't open the old notes, so he's starting fresh.";
+    }
+
+    /**
+     * Returns all tasks in the current task list.
      *
      * @param tasks the tasks to display
+     * @return the task list message
      */
-    public void showTaskList(List<Task> tasks) {
-        System.out.println("     " + DIVIDER);
-        System.out.println("     Here are the tasks in your list:");
+    public String showTaskList(List<Task> tasks) {
+        StringBuilder message = new StringBuilder("Here are the tasks in your list:");
         for (int index = 0; index < tasks.size(); index++) {
-            System.out.println("     " + (index + 1) + "." + tasks.get(index));
+            message.append("\n").append(index + 1).append(".").append(tasks.get(index));
         }
-        System.out.println("     " + DIVIDER);
+        return message.toString();
     }
 
     /**
-     * Prints confirmation that a task was marked as completed.
+     * Returns confirmation that a task was marked as completed.
      *
      * @param task the task that was marked
+     * @return the task-marked message
      */
-    public void showTaskMarked(Task task) {
-        System.out.println("     " + DIVIDER);
-        System.out.println("     Good job on completing:");
-        System.out.println("       " + task);
-        System.out.println("     " + DIVIDER);
+    public String showTaskMarked(Task task) {
+        return "Good job on completing:\n  " + task;
     }
 
     /**
-     * Prints confirmation that a task was marked as incomplete.
+     * Returns confirmation that a task was marked as incomplete.
      *
      * @param task the task that was unmarked
+     * @return the task-unmarked message
      */
-    public void showTaskUnmarked(Task task) {
-        System.out.println("     " + DIVIDER);
-        System.out.println("     OK, I've marked this task as not done yet:");
-        System.out.println("       " + task);
-        System.out.println("     " + DIVIDER);
+    public String showTaskUnmarked(Task task) {
+        return "OK, I've marked this task as not done yet:\n  " + task;
     }
 
     /**
-     * Prints confirmation that a task was removed.
+     * Returns confirmation that a task was removed.
      *
      * @param task the task that was removed
      * @param taskCount the new number of tasks
+     * @return the task-removed message
      */
-    public void showTaskRemoved(Task task, int taskCount) {
-        System.out.println("     " + DIVIDER);
-        System.out.println("     Noted. I've removed this task:");
-        System.out.println("       " + task);
-        System.out.println("     Now you have " + taskCount + " tasks in the list.");
-        System.out.println("     " + DIVIDER);
+    public String showTaskRemoved(Task task, int taskCount) {
+        return "Noted. I've removed this task:\n  " + task
+                + "\nNow you have " + taskCount + " tasks in the list.";
     }
 
     /**
-     * Prints confirmation that a task was added.
+     * Returns confirmation that a task was added.
      *
      * @param task the task that was added
      * @param taskCount the new number of tasks
+     * @return the task-added message
      */
-    public void showTaskAdded(Task task, int taskCount) {
-        System.out.println("     " + DIVIDER);
-        System.out.println("     Got it. I've added this task:");
-        System.out.println("       " + task);
-        System.out.println("     Now you have " + taskCount + " tasks in the list.");
-        System.out.println("     " + DIVIDER);
+    public String showTaskAdded(Task task, int taskCount) {
+        return "Got it. I've added this task:\n  " + task
+                + "\nNow you have " + taskCount + " tasks in the list.";
     }
 
     /**
-     * Prints tasks occurring on a specific date.
+     * Returns tasks occurring on a specific date.
      *
      * @param matchingTasks the tasks that occur on the requested date
      * @param requestedDate the date that was requested, shown for context only
+     * @return the date-query message
      */
-    public void showTasksOnDate(List<Task> matchingTasks, LocalDate requestedDate) {
-        System.out.println("     " + DIVIDER);
+    public String showTasksOnDate(List<Task> matchingTasks, LocalDate requestedDate) {
         if (matchingTasks.isEmpty()) {
-            System.out.println("     Peter checked and came up empty for that day.");
-        } else {
-            System.out.println("     Here's what Peter dug up for that day:");
-            for (Task task : matchingTasks) {
-                System.out.println("       " + task);
-            }
+            return "Peter checked and came up empty for that day.";
         }
-        System.out.println("     " + DIVIDER);
+        StringBuilder message = new StringBuilder("Here's what Peter dug up for that day:");
+        for (Task task : matchingTasks) {
+            message.append("\n  ").append(task);
+        }
+        return message.toString();
     }
 
     /**
-     * Prints tasks matching a search keyword.
+     * Returns tasks matching a search keyword.
      *
      * @param matchingTasks the tasks that matched the search
+     * @return the search-result message
      */
-    public void showFoundTasks(List<Task> matchingTasks) {
-        System.out.println("     " + DIVIDER);
+    public String showFoundTasks(List<Task> matchingTasks) {
         if (matchingTasks.isEmpty()) {
-            System.out.println("     Peter searched high and low but found nothing matching that.");
-        } else {
-            System.out.println("     Here's what Peter dug up matching that:");
-            for (int index = 0; index < matchingTasks.size(); index++) {
-                System.out.println("     " + (index + 1) + "." + matchingTasks.get(index));
-            }
+            return "Peter searched high and low but found nothing matching that.";
         }
-        System.out.println("     " + DIVIDER);
-    }
-
-    /**
-     * Prints a boxed error message in Peter's usual style.
-     *
-     * @param message the error message to display
-     */
-    public void showError(String message) {
-        System.out.println("     " + DIVIDER);
-        System.out.println("     " + message);
-        System.out.println("     " + DIVIDER);
+        StringBuilder message = new StringBuilder("Here's what Peter dug up matching that:");
+        for (int index = 0; index < matchingTasks.size(); index++) {
+            message.append("\n").append(index + 1).append(".").append(matchingTasks.get(index));
+        }
+        return message.toString();
     }
 }

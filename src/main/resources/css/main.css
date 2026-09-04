@@ -1,0 +1,73 @@
+.root-pane {
+    -fx-background-color: #111214;
+    -fx-background-image: url("/images/web-pattern.png");
+    -fx-background-repeat: repeat;
+}
+
+.banner {
+    -fx-background-color: #0a0a0b;
+    -fx-border-color: transparent transparent #d52535 transparent;
+    -fx-border-width: 0 0 3 0;
+    -fx-alignment: center;
+}
+
+.banner-title {
+    -fx-text-fill: #d52535;
+    -fx-font-family: "Segoe UI Black", "Arial Black", sans-serif;
+    -fx-font-size: 22px;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.7), 2, 0.5, 1, 1);
+}
+
+.scroll-pane, .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+#dialogContainer {
+    -fx-background-color: transparent;
+}
+
+.dialog-label {
+    -fx-font-family: "Segoe UI", sans-serif;
+    -fx-font-size: 13px;
+    -fx-padding: 10 14 10 14;
+    -fx-background-radius: 14;
+}
+
+.peter-bubble {
+    -fx-background-color: #d52535;
+    -fx-text-fill: white;
+    -fx-background-radius: 14 14 14 2;
+}
+
+.user-bubble {
+    -fx-background-color: #1b4b9c;
+    -fx-text-fill: white;
+    -fx-background-radius: 14 14 2 14;
+}
+
+.text-field {
+    -fx-background-color: #1a1b1e;
+    -fx-text-fill: white;
+    -fx-prompt-text-fill: #8a8a8e;
+    -fx-background-radius: 8;
+    -fx-border-color: #2a2b2f;
+    -fx-border-radius: 8;
+    -fx-font-size: 13px;
+    -fx-highlight-fill: #d52535;
+}
+
+.button {
+    -fx-background-color: #d52535;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #b81f31;
+}
+
+.button:pressed {
+    -fx-background-color: #931827;
+}
