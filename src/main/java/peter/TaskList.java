@@ -11,11 +11,6 @@ import java.util.List;
 public class TaskList {
     private final ArrayList<Task> tasks;
 
-    /** Creates an empty task list. */
-    public TaskList() {
-        this.tasks = new ArrayList<>();
-    }
-
     /**
      * Creates a task list pre-populated with tasks, typically loaded from storage.
      *
@@ -23,6 +18,15 @@ public class TaskList {
      */
     public TaskList(List<Task> loadedTasks) {
         this.tasks = new ArrayList<>(loadedTasks);
+    }
+
+    /**
+     * Creates a task list pre-populated with the given tasks, in argument order.
+     *
+     * @param tasks the tasks to start with
+     */
+    public TaskList(Task... tasks) {
+        this.tasks = new ArrayList<>(List.of(tasks));
     }
 
     /**

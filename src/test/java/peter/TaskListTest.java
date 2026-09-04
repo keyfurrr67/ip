@@ -141,4 +141,15 @@ public class TaskListTest {
         assertEquals(1, loadedList.size());
         assertEquals(loadedTodo, loadedList.getAll().get(0));
     }
+
+    @Test
+    public void constructor_withVarargsTasks_preservesAllTasksInOrder() {
+        Todo firstTask = new Todo("read book");
+        Todo secondTask = new Todo("return book");
+        TaskList varargsList = new TaskList(firstTask, secondTask);
+
+        assertEquals(2, varargsList.size());
+        assertEquals(firstTask, varargsList.getAll().get(0));
+        assertEquals(secondTask, varargsList.getAll().get(1));
+    }
 }
