@@ -13,6 +13,9 @@ import javafx.stage.Stage;
  * Displays Peter's JavaFX graphical interface.
  */
 public class Main extends Application {
+    private static final double WINDOW_MIN_HEIGHT = 600.0;
+    private static final double WINDOW_MIN_WIDTH = 400.0;
+
     private final Peter peter = new Peter();
 
     /** {@inheritDoc} */
@@ -25,6 +28,9 @@ public class Main extends Application {
             scene.getStylesheets().add(Main.class.getResource("/css/main.css").toExternalForm());
             stage.setScene(scene);
             stage.setTitle("Peter");
+            stage.setResizable(false);
+            stage.setMinHeight(WINDOW_MIN_HEIGHT);
+            stage.setMinWidth(WINDOW_MIN_WIDTH);
             stage.getIcons().add(new Image(Main.class.getResourceAsStream("/images/Peter.png")));
             fxmlLoader.<MainWindow>getController().setPeter(peter);
             stage.show();
