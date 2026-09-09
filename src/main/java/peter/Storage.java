@@ -10,6 +10,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Handles saving tasks to and loading tasks from a text file.
@@ -39,20 +41,16 @@ public class Storage {
      * @throws PeterException if the data file or its directory cannot be read
      */
     public ArrayList<Task> load() throws PeterException {
-        ArrayList<Task> loadedTasks = new ArrayList<>();
         try {
             ensureDataFileExists();
             List<String> lines = Files.readAllLines(filePath, StandardCharsets.UTF_8);
-            for (String line : lines) {
-                Task task = parseTask(line);
-                if (task != null) {
-                    loadedTasks.add(task);
-                }
-            }
+            return lines.stream()
+                    .map(this::parseTask)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toCollection(ArrayList::new));
         } catch (IOException exception) {
             throw new PeterException("Peter couldn't open the old notes, so he's starting fresh.");
         }
-        return loadedTasks;
     }
 
     /**
@@ -61,10 +59,9 @@ public class Storage {
      * @param tasks the current list of tasks to save
      */
     public void save(ArrayList<Task> tasks) {
-        ArrayList<String> taskLines = new ArrayList<>();
-        for (Task task : tasks) {
-            taskLines.add(task.toFileFormat());
-        }
+        List<String> taskLines = tasks.stream()
+                .map(Task::toFileFormat)
+                .collect(Collectors.toList());
         try {
             ensureDataFileExists();
             Files.write(filePath, taskLines, StandardCharsets.UTF_8,
