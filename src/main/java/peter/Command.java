@@ -13,6 +13,7 @@ public enum Command {
      * @return the matching command, or {@link #UNKNOWN} if there is no match
      */
     public static Command fromKeyword(String keyword) {
+        assert keyword != null : "command keyword should not be null";
         try {
             return Command.valueOf(keyword.toUpperCase());
         } catch (IllegalArgumentException exception) {
