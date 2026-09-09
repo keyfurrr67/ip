@@ -18,6 +18,7 @@ public class TaskList {
      * @param loadedTasks the tasks to start with
      */
     public TaskList(List<Task> loadedTasks) {
+        assert loadedTasks != null : "loaded task list should not be null";
         this.tasks = new ArrayList<>(loadedTasks);
     }
 

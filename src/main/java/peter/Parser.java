@@ -62,6 +62,7 @@ public class Parser {
      * @throws PeterException if the input is empty
      */
     public static ParsedInput parseInput(String rawInput) throws PeterException {
+        assert rawInput != null : "raw input should not be null";
         if (rawInput.isEmpty()) {
             throw new PeterException("yea you're gonna have to give me more than that buddy.");
         }
