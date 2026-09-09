@@ -131,24 +131,12 @@ public class Peter {
                 storage.save(tasks.getAll());
                 return ui.showTaskRemoved(removedTask, tasks.size());
             }
-            case TODO: {
-                Task task = Parser.parseTodo(arguments);
-                tasks.add(task);
-                storage.save(tasks.getAll());
-                return ui.showTaskAdded(task, tasks.size());
-            }
-            case DEADLINE: {
-                Task task = Parser.parseDeadline(arguments);
-                tasks.add(task);
-                storage.save(tasks.getAll());
-                return ui.showTaskAdded(task, tasks.size());
-            }
-            case EVENT: {
-                Task task = Parser.parseEvent(arguments);
-                tasks.add(task);
-                storage.save(tasks.getAll());
-                return ui.showTaskAdded(task, tasks.size());
-            }
+            case TODO:
+                return addTaskAndRespond(Parser.parseTodo(arguments));
+            case DEADLINE:
+                return addTaskAndRespond(Parser.parseDeadline(arguments));
+            case EVENT:
+                return addTaskAndRespond(Parser.parseEvent(arguments));
             case ON: {
                 LocalDate requestedDate = Parser.parseDate(arguments);
                 return ui.showTasksOnDate(tasks.getTasksOnDate(requestedDate), requestedDate);
@@ -160,6 +148,20 @@ public class Peter {
             default:
                 throw new PeterException("I can't recognise that cus im not that developed yet, maybe next time");
         }
+    }
+
+    /**
+     * Adds a task to the list, persists the updated list, and returns
+     * Peter's confirmation message. Shared by the todo, deadline, and event
+     * commands, which otherwise repeated this exact three-step sequence.
+     *
+     * @param task the task to add
+     * @return the task-added confirmation message
+     */
+    private String addTaskAndRespond(Task task) {
+        tasks.add(task);
+        storage.save(tasks.getAll());
+        return ui.showTaskAdded(task, tasks.size());
     }
 
     /**
