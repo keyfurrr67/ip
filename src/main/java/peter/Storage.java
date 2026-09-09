@@ -128,6 +128,7 @@ public class Storage {
      * @return the reconstructed task, or {@code null} when its structure is invalid
      */
     private Task createTask(String[] parts, String originalLine) {
+        assert parts.length >= 3 : "caller should have already validated the minimum field count";
         switch (parts[0]) {
             case TODO_TYPE:
                 if (parts.length != 3) {

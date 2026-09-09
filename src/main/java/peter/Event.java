@@ -28,6 +28,7 @@ public class Event extends Task {
      */
     public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
+        assert !to.isBefore(from) : "event end should not be before its start";
         this.from = from;
         this.to = to;
     }
