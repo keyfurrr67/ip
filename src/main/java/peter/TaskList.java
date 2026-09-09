@@ -3,6 +3,7 @@ package peter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Represents the current list of tasks and the operations that can be
@@ -114,15 +115,26 @@ public class TaskList {
      * @return the tasks occurring on that date
      */
     public List<Task> getTasksOnDate(LocalDate date) {
-        List<Task> matchingTasks = new ArrayList<>();
-        for (Task task : tasks) {
-            if (task instanceof Deadline && ((Deadline) task).getBy().toLocalDate().equals(date)) {
-                matchingTasks.add(task);
-            } else if (task instanceof Event && ((Event) task).getFrom().toLocalDate().equals(date)) {
-                matchingTasks.add(task);
-            }
+        return tasks.stream()
+                .filter(task -> occursOnDate(task, date))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Checks whether a task is a deadline due, or an event starting, on the given date.
+     *
+     * @param task the task to check
+     * @param date the date to match against
+     * @return true if the task occurs on that date
+     */
+    private static boolean occursOnDate(Task task, LocalDate date) {
+        if (task instanceof Deadline) {
+            return ((Deadline) task).getBy().toLocalDate().equals(date);
         }
-        return matchingTasks;
+        if (task instanceof Event) {
+            return ((Event) task).getFrom().toLocalDate().equals(date);
+        }
+        return false;
     }
 
     /**
@@ -132,13 +144,9 @@ public class TaskList {
      * @return the matching tasks
      */
     public List<Task> findTasks(String keyword) {
-        List<Task> matchingTasks = new ArrayList<>();
-        for (Task task : tasks) {
-            if (task.getDescription().contains(keyword)) {
-                matchingTasks.add(task);
-            }
-        }
-        return matchingTasks;
+        return tasks.stream()
+                .filter(task -> task.getDescription().contains(keyword))
+                .collect(Collectors.toList());
     }
 
     /**

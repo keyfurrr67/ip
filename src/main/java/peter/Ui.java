@@ -3,6 +3,8 @@ package peter;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Builds Peter's response text for user-facing events, and reads console
@@ -84,11 +86,14 @@ public class Ui {
      * @return the task list message
      */
     public String showTaskList(List<Task> tasks) {
-        StringBuilder message = new StringBuilder("Here are the tasks in your list:");
-        for (int index = 0; index < tasks.size(); index++) {
-            message.append("\n").append(index + 1).append(".").append(tasks.get(index));
+        String header = "Here are the tasks in your list:";
+        if (tasks.isEmpty()) {
+            return header;
         }
-        return message.toString();
+        String lines = IntStream.rangeClosed(1, tasks.size())
+                .mapToObj(number -> number + "." + tasks.get(number - 1))
+                .collect(Collectors.joining("\n"));
+        return header + "\n" + lines;
     }
 
     /**
@@ -146,11 +151,10 @@ public class Ui {
         if (matchingTasks.isEmpty()) {
             return "Peter checked and came up empty for that day.";
         }
-        StringBuilder message = new StringBuilder("Here's what Peter dug up for that day:");
-        for (Task task : matchingTasks) {
-            message.append("\n  ").append(task);
-        }
-        return message.toString();
+        String lines = matchingTasks.stream()
+                .map(task -> "  " + task)
+                .collect(Collectors.joining("\n"));
+        return "Here's what Peter dug up for that day:\n" + lines;
     }
 
     /**
@@ -163,10 +167,9 @@ public class Ui {
         if (matchingTasks.isEmpty()) {
             return "Peter searched high and low but found nothing matching that.";
         }
-        StringBuilder message = new StringBuilder("Here's what Peter dug up matching that:");
-        for (int index = 0; index < matchingTasks.size(); index++) {
-            message.append("\n").append(index + 1).append(".").append(matchingTasks.get(index));
-        }
-        return message.toString();
+        String lines = IntStream.rangeClosed(1, matchingTasks.size())
+                .mapToObj(number -> number + "." + matchingTasks.get(number - 1))
+                .collect(Collectors.joining("\n"));
+        return "Here's what Peter dug up matching that:\n" + lines;
     }
 }
