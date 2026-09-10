@@ -1,7 +1,6 @@
 package peter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -101,7 +100,7 @@ public class TaskListTest {
     }
 
     @Test
-    public void getTasksOnDate_matchingDeadlineAndEvent_returnsBoth() {
+    public void getScheduleForDate_matchingDeadlineAndEvent_returnsDeadlineBeforeEvent() {
         LocalDate targetDate = LocalDate.of(2019, 12, 2);
         Deadline matchingDeadline = new Deadline("return book",
                 LocalDateTime.of(2019, 12, 2, 18, 0));
@@ -111,26 +110,51 @@ public class TaskListTest {
         Deadline nonMatchingDeadline = new Deadline("submit report",
                 LocalDateTime.of(2019, 12, 3, 18, 0));
 
-        taskList.add(matchingDeadline);
+        // Added in event-then-deadline order, to confirm the result is
+        // reordered rather than just returned in insertion order.
         taskList.add(matchingEvent);
+        taskList.add(matchingDeadline);
         taskList.add(nonMatchingDeadline);
         taskList.add(new Todo("unrelated todo"));
 
-        List<Task> tasksOnDate = taskList.getTasksOnDate(targetDate);
+        List<Task> schedule = taskList.getScheduleForDate(targetDate);
 
-        assertEquals(2, tasksOnDate.size());
-        assertTrue(tasksOnDate.contains(matchingDeadline));
-        assertTrue(tasksOnDate.contains(matchingEvent));
-        assertFalse(tasksOnDate.contains(nonMatchingDeadline));
+        assertEquals(List.of(matchingDeadline, matchingEvent), schedule);
     }
 
     @Test
-    public void getTasksOnDate_noMatches_returnsEmptyList() {
+    public void getScheduleForDate_multipleDeadlinesAndEvents_sortsEachGroupChronologically() {
+        LocalDate targetDate = LocalDate.of(2019, 12, 2);
+        Deadline laterDeadline = new Deadline("submit report",
+                LocalDateTime.of(2019, 12, 2, 20, 0));
+        Deadline earlierDeadline = new Deadline("return book",
+                LocalDateTime.of(2019, 12, 2, 9, 0));
+        Event laterEvent = new Event("dinner",
+                LocalDateTime.of(2019, 12, 2, 19, 0),
+                LocalDateTime.of(2019, 12, 2, 21, 0));
+        Event earlierEvent = new Event("project meeting",
+                LocalDateTime.of(2019, 12, 2, 14, 0),
+                LocalDateTime.of(2019, 12, 2, 16, 0));
+
+        // Added out of chronological order within each type, to confirm
+        // each group is sorted rather than left in insertion order.
+        taskList.add(laterDeadline);
+        taskList.add(laterEvent);
+        taskList.add(earlierEvent);
+        taskList.add(earlierDeadline);
+
+        List<Task> schedule = taskList.getScheduleForDate(targetDate);
+
+        assertEquals(List.of(earlierDeadline, laterDeadline, earlierEvent, laterEvent), schedule);
+    }
+
+    @Test
+    public void getScheduleForDate_noMatches_returnsEmptyList() {
         taskList.add(new Deadline("return book", LocalDateTime.of(2019, 12, 2, 18, 0)));
 
-        List<Task> tasksOnDate = taskList.getTasksOnDate(LocalDate.of(2020, 1, 1));
+        List<Task> schedule = taskList.getScheduleForDate(LocalDate.of(2020, 1, 1));
 
-        assertTrue(tasksOnDate.isEmpty());
+        assertTrue(schedule.isEmpty());
     }
 
     @Test

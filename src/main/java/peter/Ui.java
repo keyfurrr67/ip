@@ -141,20 +141,21 @@ public class Ui {
     }
 
     /**
-     * Returns tasks occurring on a specific date.
+     * Returns the schedule for a specific date: deadlines due, then events
+     * starting, on that date.
      *
-     * @param matchingTasks the tasks that occur on the requested date
+     * @param scheduledTasks the deadlines and events occurring on the requested date, in display order
      * @param requestedDate the date that was requested, shown for context only
-     * @return the date-query message
+     * @return the schedule message
      */
-    public String showTasksOnDate(List<Task> matchingTasks, LocalDate requestedDate) {
-        if (matchingTasks.isEmpty()) {
-            return "Peter checked and came up empty for that day.";
+    public String showSchedule(List<Task> scheduledTasks, LocalDate requestedDate) {
+        if (scheduledTasks.isEmpty()) {
+            return "Peter checked and found no schedule for that day.";
         }
-        String lines = matchingTasks.stream()
+        String lines = scheduledTasks.stream()
                 .map(task -> "  " + task)
                 .collect(Collectors.joining("\n"));
-        return "Here's what Peter dug up for that day:\n" + lines;
+        return "Here's your schedule for that day:\n" + lines;
     }
 
     /**

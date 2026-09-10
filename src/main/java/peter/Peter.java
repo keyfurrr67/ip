@@ -137,9 +137,9 @@ public class Peter {
                 return addTaskAndRespond(Parser.parseDeadline(arguments));
             case EVENT:
                 return addTaskAndRespond(Parser.parseEvent(arguments));
-            case ON: {
+            case SCHEDULE: {
                 LocalDate requestedDate = Parser.parseDate(arguments);
-                return ui.showTasksOnDate(tasks.getTasksOnDate(requestedDate), requestedDate);
+                return ui.showSchedule(tasks.getScheduleForDate(requestedDate), requestedDate);
             }
             case FIND: {
                 String keyword = Parser.parseFindKeyword(arguments);
