@@ -167,7 +167,7 @@ public class Parser {
     }
 
     /**
-     * Parses the date used by the {@code on} command.
+     * Parses the date used by the {@code schedule} command.
      *
      * @param arguments the date entered by the user
      * @return the parsed date

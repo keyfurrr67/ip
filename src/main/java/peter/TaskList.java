@@ -2,8 +2,10 @@ package peter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Represents the current list of tasks and the operations that can be
@@ -109,32 +111,28 @@ public class TaskList {
     }
 
     /**
-     * Returns the deadlines due, and events starting, on the given date.
+     * Returns the schedule for the given date: deadlines due that day,
+     * sorted by due time, followed by events starting that day, sorted by
+     * start time.
      *
      * @param date the date to match against
-     * @return the tasks occurring on that date
+     * @return the deadlines due, then the events starting, on that date
      */
-    public List<Task> getTasksOnDate(LocalDate date) {
-        return tasks.stream()
-                .filter(task -> occursOnDate(task, date))
+    public List<Task> getScheduleForDate(LocalDate date) {
+        List<Deadline> deadlinesOnDate = tasks.stream()
+                .filter(task -> task instanceof Deadline)
+                .map(task -> (Deadline) task)
+                .filter(deadline -> deadline.getBy().toLocalDate().equals(date))
+                .sorted(Comparator.comparing(Deadline::getBy))
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * Checks whether a task is a deadline due, or an event starting, on the given date.
-     *
-     * @param task the task to check
-     * @param date the date to match against
-     * @return true if the task occurs on that date
-     */
-    private static boolean occursOnDate(Task task, LocalDate date) {
-        if (task instanceof Deadline) {
-            return ((Deadline) task).getBy().toLocalDate().equals(date);
-        }
-        if (task instanceof Event) {
-            return ((Event) task).getFrom().toLocalDate().equals(date);
-        }
-        return false;
+        List<Event> eventsOnDate = tasks.stream()
+                .filter(task -> task instanceof Event)
+                .map(task -> (Event) task)
+                .filter(event -> event.getFrom().toLocalDate().equals(date))
+                .sorted(Comparator.comparing(Event::getFrom))
+                .collect(Collectors.toList());
+        return Stream.<Task>concat(deadlinesOnDate.stream(), eventsOnDate.stream())
+                .collect(Collectors.toList());
     }
 
     /**

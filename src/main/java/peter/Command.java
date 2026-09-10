@@ -4,7 +4,7 @@ package peter;
  * Lists the commands understood by Peter.
  */
 public enum Command {
-    BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, ON, FIND, UNKNOWN;
+    BYE, LIST, MARK, UNMARK, DELETE, TODO, DEADLINE, EVENT, SCHEDULE, FIND, UNKNOWN;
 
     /**
      * Converts a command keyword into its matching command value.
