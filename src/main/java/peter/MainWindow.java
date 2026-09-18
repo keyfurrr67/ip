@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -26,9 +25,6 @@ public class MainWindow extends AnchorPane {
     @FXML
     private Button sendButton;
 
-    private final Image userImage = new Image(this.getClass().getResourceAsStream("/images/User.png"));
-    private final Image peterImage = new Image(this.getClass().getResourceAsStream("/images/Peter.png"));
-
     private Peter peter;
 
     /** Binds the dialog scroll position to the container's height. */
@@ -44,9 +40,12 @@ public class MainWindow extends AnchorPane {
      */
     public void setPeter(Peter peter) {
         this.peter = peter;
+        DialogBox loadingDialog = peter.isLoadingError()
+                ? DialogBox.getErrorDialog(peter.getLoadingMessage())
+                : DialogBox.getPeterDialog(peter.getLoadingMessage());
         dialogContainer.getChildren().addAll(
-                DialogBox.getPeterDialog(peter.getWelcomeMessage(), peterImage),
-                DialogBox.getPeterDialog(peter.getLoadingMessage(), peterImage));
+                DialogBox.getPeterDialog(peter.getWelcomeMessage()),
+                loadingDialog);
     }
 
     /**
@@ -61,10 +60,11 @@ public class MainWindow extends AnchorPane {
             return;
         }
 
-        String response = peter.getResponse(input);
-        dialogContainer.getChildren().addAll(
-                DialogBox.getUserDialog(input, userImage),
-                DialogBox.getPeterDialog(response, peterImage));
+        Peter.Response response = peter.getResponse(input);
+        DialogBox responseDialog = response.isError()
+                ? DialogBox.getErrorDialog(response.text())
+                : DialogBox.getPeterDialog(response.text());
+        dialogContainer.getChildren().addAll(DialogBox.getUserDialog(input), responseDialog);
         userInput.clear();
 
         if (peter.isExit()) {

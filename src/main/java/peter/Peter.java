@@ -13,8 +13,20 @@ public class Peter {
     private final Storage storage;
     private final Ui ui;
     private final String loadingMessage;
+    private final boolean isLoadingError;
     private TaskList tasks;
     private boolean isExit = false;
+
+    /**
+     * Peter's response to one line of input, and whether it represents an
+     * error (an unrecognised command or invalid input) rather than a normal
+     * reply, so callers like the GUI can style the two differently.
+     *
+     * @param text the response text to show the user
+     * @param isError whether this response is an error message
+     */
+    public record Response(String text, boolean isError) {
+    }
 
     /** Creates Peter, loading any previously saved tasks from the default data file. */
     public Peter() {
@@ -30,14 +42,18 @@ public class Peter {
         ui = new Ui();
         storage = new Storage(filePath);
         String message;
+        boolean loadFailed;
         try {
             tasks = new TaskList(storage.load());
             message = ui.showLoadingResult(tasks.size());
+            loadFailed = false;
         } catch (PeterException exception) {
             message = ui.showLoadingError();
             tasks = new TaskList();
+            loadFailed = true;
         }
         loadingMessage = message;
+        isLoadingError = loadFailed;
     }
 
     /** Runs Peter's command-line interface until the user exits. */
@@ -46,7 +62,7 @@ public class Peter {
         printBoxed(loadingMessage);
         while (!isExit) {
             String input = ui.readCommand();
-            printBoxed(getResponse(input));
+            printBoxed(getResponse(input).text());
         }
         ui.close();
     }
@@ -57,17 +73,17 @@ public class Peter {
      * response text.
      *
      * @param input the raw line entered by the user
-     * @return Peter's response
+     * @return Peter's response, and whether it is an error message
      */
-    public String getResponse(String input) {
+    public Response getResponse(String input) {
         try {
             Parser.ParsedInput parsedInput = Parser.parseInput(input);
             if (parsedInput.getCommand() == Command.BYE) {
                 isExit = true;
             }
-            return handleCommand(parsedInput);
+            return new Response(handleCommand(parsedInput), false);
         } catch (PeterException exception) {
-            return exception.getMessage();
+            return new Response(exception.getMessage(), true);
         }
     }
 
@@ -87,6 +103,16 @@ public class Peter {
      */
     public String getLoadingMessage() {
         return loadingMessage;
+    }
+
+    /**
+     * Returns whether saved tasks failed to load at startup, so the loading
+     * message can be styled as an error rather than a normal reply.
+     *
+     * @return {@code true} if the loading message is an error message
+     */
+    public boolean isLoadingError() {
+        return isLoadingError;
     }
 
     /**

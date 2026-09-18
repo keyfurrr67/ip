@@ -28,7 +28,6 @@ public class Main extends Application {
             scene.getStylesheets().add(Main.class.getResource("/css/main.css").toExternalForm());
             stage.setScene(scene);
             stage.setTitle("Peter");
-            stage.setResizable(false);
             stage.setMinHeight(WINDOW_MIN_HEIGHT);
             stage.setMinWidth(WINDOW_MIN_WIDTH);
             stage.getIcons().add(new Image(Main.class.getResourceAsStream("/images/Peter.png")));
