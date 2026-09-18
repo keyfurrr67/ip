@@ -7,7 +7,7 @@ import java.time.LocalDate;
  * command-line and a JavaFX interface.
  */
 public class Peter {
-    private static final String DATA_FILE_PATH = "./data/duke.txt";
+    private static final String DATA_FILE_PATH = "./data/peter.txt";
     private static final String DIVIDER = "____________________________________________________________";
 
     private final Storage storage;

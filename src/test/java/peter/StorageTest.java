@@ -27,7 +27,7 @@ public class StorageTest {
 
     @Test
     public void load_missingFile_createsFileAndReturnsEmptyList() throws Exception {
-        Path dataFile = tempDir.resolve("duke.txt");
+        Path dataFile = tempDir.resolve("peter.txt");
         Storage storage = new Storage(dataFile.toString());
 
         List<Task> loaded = storage.load();
@@ -38,7 +38,7 @@ public class StorageTest {
 
     @Test
     public void load_missingParentDirectory_createsDirectoryAndFile() throws Exception {
-        Path dataFile = tempDir.resolve("nested/dir/duke.txt");
+        Path dataFile = tempDir.resolve("nested/dir/peter.txt");
         Storage storage = new Storage(dataFile.toString());
 
         List<Task> loaded = storage.load();
@@ -49,7 +49,7 @@ public class StorageTest {
 
     @Test
     public void load_dataFileIsActuallyADirectory_throwsPeterException() throws Exception {
-        Path dataAsDirectory = tempDir.resolve("duke.txt");
+        Path dataAsDirectory = tempDir.resolve("peter.txt");
         Files.createDirectory(dataAsDirectory);
         Storage storage = new Storage(dataAsDirectory.toString());
 
@@ -63,7 +63,7 @@ public class StorageTest {
         // not a directory, so Files.createDirectories cannot proceed.
         Path blockingFile = tempDir.resolve("data");
         Files.createFile(blockingFile);
-        Storage storage = new Storage(blockingFile.resolve("duke.txt").toString());
+        Storage storage = new Storage(blockingFile.resolve("peter.txt").toString());
 
         assertThrows(PeterException.class, storage::load);
     }
@@ -74,7 +74,7 @@ public class StorageTest {
         // since losing the in-memory list over a save failure would be worse for the user.
         Path blockingFile = tempDir.resolve("data");
         Files.createFile(blockingFile);
-        Storage storage = new Storage(blockingFile.resolve("duke.txt").toString());
+        Storage storage = new Storage(blockingFile.resolve("peter.txt").toString());
         ArrayList<Task> tasks = new ArrayList<>();
         tasks.add(new Todo("read book"));
 
@@ -133,7 +133,7 @@ public class StorageTest {
 
     @Test
     public void saveAndLoad_roundTrip_preservesValidTasks() throws Exception {
-        Path dataFile = tempDir.resolve("duke.txt");
+        Path dataFile = tempDir.resolve("peter.txt");
         Storage storage = new Storage(dataFile.toString());
         ArrayList<Task> tasks = new ArrayList<>();
         tasks.add(new Todo("read book"));
@@ -146,7 +146,7 @@ public class StorageTest {
     }
 
     private List<Task> loadFromLines(String... lines) throws IOException, PeterException {
-        Path dataFile = tempDir.resolve("duke.txt");
+        Path dataFile = tempDir.resolve("peter.txt");
         Files.write(dataFile, List.of(lines), StandardCharsets.UTF_8);
         return new Storage(dataFile.toString()).load();
     }
