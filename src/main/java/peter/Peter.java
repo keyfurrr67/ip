@@ -183,8 +183,9 @@ public class Peter {
      *
      * @param task the task to add
      * @return the task-added confirmation message
+     * @throws PeterException if an equal task is already in the list
      */
-    private String addTaskAndRespond(Task task) {
+    private String addTaskAndRespond(Task task) throws PeterException {
         tasks.add(task);
         storage.save(tasks.getAll());
         return ui.showTaskAdded(task, tasks.size());
