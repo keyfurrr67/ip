@@ -24,25 +24,37 @@
 
 #dialogContainer {
     -fx-background-color: transparent;
+    -fx-padding: 12 10 12 10;
+    -fx-spacing: 10;
 }
 
 .dialog-label {
     -fx-font-family: "Segoe UI", sans-serif;
     -fx-font-size: 13px;
-    -fx-padding: 10 14 10 14;
+    -fx-padding: 10 16 10 16;
     -fx-background-radius: 14;
-}
-
-.peter-bubble {
-    -fx-background-color: #d52535;
-    -fx-text-fill: white;
-    -fx-background-radius: 14 14 14 2;
 }
 
 .user-bubble {
     -fx-background-color: #1b4b9c;
     -fx-text-fill: white;
     -fx-background-radius: 14 14 2 14;
+}
+
+.peter-card {
+    -fx-background-color: #1a1b1e;
+    -fx-text-fill: #e8e8ea;
+    -fx-background-radius: 0 10 10 0;
+    -fx-border-color: transparent transparent transparent #d52535;
+    -fx-border-width: 0 0 0 3;
+}
+
+.error-card {
+    -fx-background-color: #2a1f12;
+    -fx-text-fill: #ffd9a0;
+    -fx-background-radius: 0 10 10 0;
+    -fx-border-color: transparent transparent transparent #e8a33d;
+    -fx-border-width: 0 0 0 3;
 }
 
 .text-field {
