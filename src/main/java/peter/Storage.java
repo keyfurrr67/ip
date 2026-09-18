@@ -8,6 +8,7 @@ import java.nio.file.StandardOpenOption;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,8 +21,12 @@ public class Storage {
     private static final String TODO_TYPE = "T";
     private static final String DEADLINE_TYPE = "D";
     private static final String EVENT_TYPE = "E";
+    // STRICT so a hand-edited save file with an impossible calendar date (e.g. Feb 30)
+    // is treated as a malformed line instead of being silently resolved to a nearby date.
+    // uuuu (proleptic year), not yyyy (year-of-era): STRICT can't resolve yyyy without an
+    // explicit era field, which this format doesn't have.
     private static final DateTimeFormatter STORAGE_DATE_FORMAT =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HHmm");
+            DateTimeFormatter.ofPattern("uuuu-MM-dd'T'HHmm").withResolverStyle(ResolverStyle.STRICT);
 
     private final Path filePath;
 
@@ -139,13 +144,19 @@ public class Storage {
                     return null;
                 }
                 return new Deadline(parts[2], parseStoredDateTime(parts[3]));
-            case EVENT_TYPE:
+            case EVENT_TYPE: {
                 if (parts.length != 5 || parts[3].isEmpty() || parts[4].isEmpty()) {
                     printSkippedLineWarning(originalLine);
                     return null;
                 }
-                return new Event(parts[2], parseStoredDateTime(parts[3]),
-                        parseStoredDateTime(parts[4]));
+                LocalDateTime from = parseStoredDateTime(parts[3]);
+                LocalDateTime to = parseStoredDateTime(parts[4]);
+                if (!to.isAfter(from)) {
+                    printSkippedLineWarning(originalLine);
+                    return null;
+                }
+                return new Event(parts[2], from, to);
+            }
             default:
                 printSkippedLineWarning(originalLine);
                 return null;

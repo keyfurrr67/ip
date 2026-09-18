@@ -1,5 +1,7 @@
 package peter;
 
+import java.util.Objects;
+
 /**
  * Represents a task in Peter's task list.
  */
@@ -65,5 +67,32 @@ public class Task {
     @Override
     public String toString() {
         return getStatusIcon() + " " + description;
+    }
+
+    /**
+     * Compares tasks by type and description, ignoring completion state, so
+     * that marking a task done does not change what counts as a duplicate of
+     * it. Subclasses with extra fields (e.g. a deadline's due time) override
+     * this to also compare those fields.
+     *
+     * @param other the object to compare against
+     * @return true if {@code other} is a task of the same concrete type with an equal description
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+        Task otherTask = (Task) other;
+        return description.equals(otherTask.description);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return Objects.hash(getClass(), description);
     }
 }

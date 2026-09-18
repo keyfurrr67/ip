@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Represents a task that occurs during a specified period.
@@ -28,7 +29,10 @@ public class Event extends Task {
      */
     public Event(String description, LocalDateTime from, LocalDateTime to) {
         super(description);
-        assert !to.isBefore(from) : "event end should not be before its start";
+        // Genuinely enforced now (not just documented): Parser.parseEvent rejects a
+        // non-after end time before an Event is ever constructed, and Storage.createTask
+        // discards a saved line that fails this same check instead of loading it.
+        assert to.isAfter(from) : "event end should be strictly after its start";
         this.from = from;
         this.to = to;
     }
@@ -75,5 +79,26 @@ public class Event extends Task {
             return dateTime.format(OUTPUT_DATE_FORMAT);
         }
         return dateTime.format(OUTPUT_DATE_TIME_FORMAT);
+    }
+
+    /**
+     * Compares events by description, start, and end time, per {@link Task#equals}.
+     *
+     * @param other the object to compare against
+     * @return true if {@code other} is an event with an equal description, start, and end time
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (!super.equals(other)) {
+            return false;
+        }
+        Event otherEvent = (Event) other;
+        return from.equals(otherEvent.from) && to.equals(otherEvent.to);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), from, to);
     }
 }

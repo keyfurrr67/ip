@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 
 /**
  * Makes sense of raw user input: splitting it into a command and arguments,
@@ -11,16 +12,28 @@ import java.time.format.DateTimeParseException;
  * not mutate the task list directly.
  */
 public class Parser {
+    // STRICT (rather than the default SMART) so an impossible calendar date like
+    // 2019-02-30 is rejected outright instead of silently being resolved to 2019-02-28.
+    // Uses uuuu (proleptic year) rather than yyyy (year-of-era): under STRICT, yyyy needs
+    // an explicit era field to resolve, which this format doesn't have, and parsing fails
+    // even for a valid date.
     private static final DateTimeFormatter INPUT_DATE_TIME_FORMAT =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
+            DateTimeFormatter.ofPattern("uuuu-MM-dd HHmm").withResolverStyle(ResolverStyle.STRICT);
     private static final DateTimeFormatter INPUT_DATE_FORMAT =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT);
     private static final String MISSING_ARGUMENTS_MESSAGE =
             "Whoa, my spidey-sense needs more than that to work with, pal.";
     private static final String INVALID_DATE_MESSAGE =
-            "That date's got my spidey-sense all tangled - try yyyy-MM-dd.";
+            "That date's got my spidey-sense all tangled - try yyyy-MM-dd, with a real calendar date.";
     private static final String INVALID_DATE_TIME_MESSAGE =
-            "That date's got my spidey-sense all tangled - try yyyy-MM-dd or yyyy-MM-dd HHmm.";
+            "That date's got my spidey-sense all tangled - try yyyy-MM-dd or yyyy-MM-dd HHmm, "
+                    + "with a real calendar date.";
+    private static final String INVALID_DESCRIPTION_MESSAGE =
+            "Can't have a '|' or a line break in there, pal - that'll tear a hole in my web (the save file).";
+    private static final String DUPLICATE_MARKER_MESSAGE_FORMAT =
+            "One %s is plenty, pal - you've webbed that marker in there twice.";
+    private static final String EVENT_END_NOT_AFTER_START_MESSAGE =
+            "An event's gotta end after it starts, pal - check your /from and /to.";
 
     /**
      * Represents a raw line of input split into its command keyword and the
@@ -69,12 +82,13 @@ public class Parser {
      */
     public static ParsedInput parseInput(String rawInput) throws PeterException {
         assert rawInput != null : "raw input should not be null";
-        if (rawInput.isEmpty()) {
+        String trimmedInput = rawInput.trim();
+        if (trimmedInput.isEmpty()) {
             throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
-        String keyword = rawInput.split(" ", 2)[0];
-        String arguments = rawInput.length() > keyword.length()
-                ? rawInput.substring(keyword.length()).trim() : "";
+        String[] keywordAndRest = trimmedInput.split("\\s+", 2);
+        String keyword = keywordAndRest[0];
+        String arguments = keywordAndRest.length > 1 ? keywordAndRest[1] : "";
         return new ParsedInput(Command.fromKeyword(keyword), arguments);
     }
 
@@ -89,6 +103,7 @@ public class Parser {
         if (arguments.isEmpty()) {
             throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
+        validateDescription(arguments);
         return new Todo(arguments);
     }
 
@@ -118,12 +133,16 @@ public class Parser {
         if (arguments.isEmpty() || !arguments.contains("/by")) {
             throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
+        if (countOccurrences(arguments, "/by") > 1) {
+            throw new PeterException(String.format(DUPLICATE_MARKER_MESSAGE_FORMAT, "/by"));
+        }
         String[] parts = arguments.split("/by", 2);
         String description = parts[0].trim();
-        String byText = parts[1].trim();
+        String byText = normalizeWhitespace(parts[1]);
         if (description.isEmpty() || byText.isEmpty()) {
             throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
+        validateDescription(description);
         LocalDateTime by = parseUserDateTime(byText);
         return new Deadline(description, by);
     }
@@ -140,16 +159,26 @@ public class Parser {
         if (arguments.isEmpty() || !arguments.contains("/from") || !arguments.contains("/to")) {
             throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
+        if (countOccurrences(arguments, "/from") > 1) {
+            throw new PeterException(String.format(DUPLICATE_MARKER_MESSAGE_FORMAT, "/from"));
+        }
+        if (countOccurrences(arguments, "/to") > 1) {
+            throw new PeterException(String.format(DUPLICATE_MARKER_MESSAGE_FORMAT, "/to"));
+        }
         String[] fromParts = arguments.split("/from", 2);
         String description = fromParts[0].trim();
         String[] toParts = fromParts[1].split("/to", 2);
-        String fromText = toParts[0].trim();
-        String toText = toParts.length > 1 ? toParts[1].trim() : "";
+        String fromText = normalizeWhitespace(toParts[0]);
+        String toText = toParts.length > 1 ? normalizeWhitespace(toParts[1]) : "";
         if (description.isEmpty() || fromText.isEmpty() || toText.isEmpty()) {
             throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
+        validateDescription(description);
         LocalDateTime from = parseUserDateTime(fromText);
         LocalDateTime to = parseUserDateTime(toText);
+        if (!to.isAfter(from)) {
+            throw new PeterException(EVENT_END_NOT_AFTER_START_MESSAGE);
+        }
         return new Event(description, from, to);
     }
 
@@ -181,7 +210,7 @@ public class Parser {
      */
     public static LocalDate parseDate(String arguments) throws PeterException {
         try {
-            return LocalDate.parse(arguments, INPUT_DATE_FORMAT);
+            return LocalDate.parse(normalizeWhitespace(arguments), INPUT_DATE_FORMAT);
         } catch (DateTimeParseException exception) {
             throw new PeterException(INVALID_DATE_MESSAGE);
         }
@@ -203,5 +232,48 @@ public class Parser {
         } catch (DateTimeParseException exception) {
             throw new PeterException(INVALID_DATE_TIME_MESSAGE);
         }
+    }
+
+    /**
+     * Collapses runs of whitespace within the text to a single space, and
+     * trims the ends, so a stray extra space (e.g. two spaces between a date
+     * and a time) does not cause an otherwise-valid date/time to fail to
+     * parse.
+     *
+     * @param text the text to normalise
+     * @return the trimmed text with internal whitespace runs collapsed
+     */
+    private static String normalizeWhitespace(String text) {
+        return text.trim().replaceAll("\\s+", " ");
+    }
+
+    /**
+     * Rejects a description that would corrupt Peter's pipe-delimited
+     * storage format or break its one-line-per-task layout.
+     *
+     * @param description the task description to validate
+     * @throws PeterException if the description contains a storage delimiter or a line break
+     */
+    private static void validateDescription(String description) throws PeterException {
+        if (description.contains("|") || description.contains("\n") || description.contains("\r")) {
+            throw new PeterException(INVALID_DESCRIPTION_MESSAGE);
+        }
+    }
+
+    /**
+     * Counts non-overlapping occurrences of a literal marker within text.
+     *
+     * @param text the text to search
+     * @param marker the literal marker to count
+     * @return the number of times the marker occurs
+     */
+    private static int countOccurrences(String text, String marker) {
+        int count = 0;
+        int index = text.indexOf(marker);
+        while (index != -1) {
+            count++;
+            index = text.indexOf(marker, index + marker.length());
+        }
+        return count;
     }
 }

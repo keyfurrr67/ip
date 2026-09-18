@@ -23,9 +23,35 @@ public class TaskListTest {
     }
 
     @Test
-    public void add_singleTask_increasesSize() {
+    public void add_singleTask_increasesSize() throws PeterException {
         taskList.add(new Todo("read book"));
         assertEquals(1, taskList.size());
+    }
+
+    @Test
+    public void add_exactDuplicateTask_throwsPeterExceptionAndLeavesListUnchanged() throws PeterException {
+        taskList.add(new Todo("read book"));
+
+        assertThrows(PeterException.class, () -> taskList.add(new Todo("read book")));
+        assertEquals(1, taskList.size());
+    }
+
+    @Test
+    public void add_duplicateAfterMarkingDone_stillThrowsPeterException() throws PeterException {
+        // Completion state should not affect what counts as a duplicate.
+        taskList.add(new Todo("read book"));
+        taskList.mark(0);
+
+        assertThrows(PeterException.class, () -> taskList.add(new Todo("read book")));
+    }
+
+    @Test
+    public void add_sameDescriptionDifferentTaskType_doesNotThrow() throws PeterException {
+        taskList.add(new Todo("submit report"));
+
+        taskList.add(new Deadline("submit report", LocalDateTime.of(2019, 12, 2, 18, 0)));
+
+        assertEquals(2, taskList.size());
     }
 
     @Test
@@ -36,13 +62,13 @@ public class TaskListTest {
     }
 
     @Test
-    public void get_negativeIndex_throwsPeterException() {
+    public void get_negativeIndex_throwsPeterException() throws PeterException {
         taskList.add(new Todo("read book"));
         assertThrows(PeterException.class, () -> taskList.get(-1));
     }
 
     @Test
-    public void get_indexEqualToSize_throwsPeterException() {
+    public void get_indexEqualToSize_throwsPeterException() throws PeterException {
         taskList.add(new Todo("read book"));
         // valid indices are 0..size-1, so index == size is out of range
         assertThrows(PeterException.class, () -> taskList.get(1));
@@ -67,7 +93,7 @@ public class TaskListTest {
     }
 
     @Test
-    public void delete_invalidIndex_throwsPeterExceptionAndLeavesListUnchanged() {
+    public void delete_invalidIndex_throwsPeterExceptionAndLeavesListUnchanged() throws PeterException {
         taskList.add(new Todo("read book"));
 
         assertThrows(PeterException.class, () -> taskList.delete(5));
@@ -100,7 +126,7 @@ public class TaskListTest {
     }
 
     @Test
-    public void getScheduleForDate_matchingDeadlineAndEvent_returnsDeadlineBeforeEvent() {
+    public void getScheduleForDate_matchingDeadlineAndEvent_returnsDeadlineBeforeEvent() throws PeterException {
         LocalDate targetDate = LocalDate.of(2019, 12, 2);
         Deadline matchingDeadline = new Deadline("return book",
                 LocalDateTime.of(2019, 12, 2, 18, 0));
@@ -123,7 +149,7 @@ public class TaskListTest {
     }
 
     @Test
-    public void getScheduleForDate_multipleDeadlinesAndEvents_sortsEachGroupChronologically() {
+    public void getScheduleForDate_multipleDeadlinesAndEvents_sortsEachGroupChronologically() throws PeterException {
         LocalDate targetDate = LocalDate.of(2019, 12, 2);
         Deadline laterDeadline = new Deadline("submit report",
                 LocalDateTime.of(2019, 12, 2, 20, 0));
@@ -149,7 +175,7 @@ public class TaskListTest {
     }
 
     @Test
-    public void getScheduleForDate_noMatches_returnsEmptyList() {
+    public void getScheduleForDate_noMatches_returnsEmptyList() throws PeterException {
         taskList.add(new Deadline("return book", LocalDateTime.of(2019, 12, 2, 18, 0)));
 
         List<Task> schedule = taskList.getScheduleForDate(LocalDate.of(2020, 1, 1));

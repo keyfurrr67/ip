@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.Objects;
 
 /**
  * Represents a task that should be completed by a specified date and time.
@@ -70,5 +71,26 @@ public class Deadline extends Task {
             return dateTime.format(OUTPUT_DATE_FORMAT);
         }
         return dateTime.format(OUTPUT_DATE_TIME_FORMAT);
+    }
+
+    /**
+     * Compares deadlines by description and due time, per {@link Task#equals}.
+     *
+     * @param other the object to compare against
+     * @return true if {@code other} is a deadline with an equal description and due time
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (!super.equals(other)) {
+            return false;
+        }
+        Deadline otherDeadline = (Deadline) other;
+        return by.equals(otherDeadline.by);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), by);
     }
 }

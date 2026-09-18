@@ -37,8 +37,12 @@ public class TaskList {
      * Adds a task to the end of the list.
      *
      * @param task the task to add
+     * @throws PeterException if an equal task (same type, description, and dates) is already in the list
      */
-    public void add(Task task) {
+    public void add(Task task) throws PeterException {
+        if (tasks.contains(task)) {
+            throw new PeterException("That one's already stuck to your web, pal - no need to web it twice.");
+        }
         tasks.add(task);
     }
 
@@ -155,7 +159,7 @@ public class TaskList {
      */
     private void validateIndex(int index) throws PeterException {
         if (index < 0 || index >= tasks.size()) {
-            throw new PeterException("that task doesn't exist buddy.");
+            throw new PeterException("That task's not stuck to my web, pal - check the number and try again.");
         }
     }
 }
