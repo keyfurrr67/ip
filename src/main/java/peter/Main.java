@@ -27,7 +27,7 @@ public class Main extends Application {
             Scene scene = new Scene(root);
             scene.getStylesheets().add(Main.class.getResource("/css/main.css").toExternalForm());
             stage.setScene(scene);
-            stage.setTitle("Peter");
+            stage.setTitle("Peter - Your Friendly Neighbourhood Task Manager");
             stage.setMinHeight(WINDOW_MIN_HEIGHT);
             stage.setMinWidth(WINDOW_MIN_WIDTH);
             stage.getIcons().add(new Image(Main.class.getResourceAsStream("/images/Peter.png")));

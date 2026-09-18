@@ -49,7 +49,7 @@ public class Storage {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toCollection(ArrayList::new));
         } catch (IOException exception) {
-            throw new PeterException("Peter couldn't open the old notes, so he's starting fresh.");
+            throw new PeterException("My spidey-sense says that save file's a lost cause - starting fresh.");
         }
     }
 
@@ -67,7 +67,7 @@ public class Storage {
             Files.write(filePath, taskLines, StandardCharsets.UTF_8,
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException exception) {
-            System.out.println("     Peter tried to save your notes, but the drawer got stuck.");
+            System.out.println("     Tried to stick that update to the web, but it slipped - didn't save.");
         }
     }
 
@@ -180,7 +180,7 @@ public class Storage {
      * @param line the malformed line that was skipped
      */
     private void printSkippedLineWarning(String line) {
-        System.out.println("     Peter found a scribbled-on line he couldn't read: \""
+        System.out.println("     Found a line tangled beyond recognition: \""
                 + line + "\" - skipping it.");
     }
 }
