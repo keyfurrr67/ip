@@ -1,6 +1,8 @@
 package peter;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -43,6 +45,40 @@ public class StorageTest {
 
         assertTrue(loaded.isEmpty());
         assertTrue(Files.exists(dataFile));
+    }
+
+    @Test
+    public void load_dataFileIsActuallyADirectory_throwsPeterException() throws Exception {
+        Path dataAsDirectory = tempDir.resolve("duke.txt");
+        Files.createDirectory(dataAsDirectory);
+        Storage storage = new Storage(dataAsDirectory.toString());
+
+        assertThrows(PeterException.class, storage::load);
+    }
+
+    @Test
+    public void load_parentPathIsARegularFileNotADirectory_throwsPeterException() throws Exception {
+        // Simulates a hand-broken data directory: something exists at the path where
+        // Storage expects to find (or create) the data file's parent directory, but it's
+        // not a directory, so Files.createDirectories cannot proceed.
+        Path blockingFile = tempDir.resolve("data");
+        Files.createFile(blockingFile);
+        Storage storage = new Storage(blockingFile.resolve("duke.txt").toString());
+
+        assertThrows(PeterException.class, storage::load);
+    }
+
+    @Test
+    public void save_parentPathIsARegularFileNotADirectory_doesNotThrow() throws Exception {
+        // save() only prints a warning on failure rather than propagating an exception,
+        // since losing the in-memory list over a save failure would be worse for the user.
+        Path blockingFile = tempDir.resolve("data");
+        Files.createFile(blockingFile);
+        Storage storage = new Storage(blockingFile.resolve("duke.txt").toString());
+        ArrayList<Task> tasks = new ArrayList<>();
+        tasks.add(new Todo("read book"));
+
+        assertDoesNotThrow(() -> storage.save(tasks));
     }
 
     @Test
