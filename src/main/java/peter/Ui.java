@@ -45,7 +45,8 @@ public class Ui {
      * @return the greeting message
      */
     public String showWelcome() {
-        return BANNER + "My name is Peter\nHow am I saving you today?";
+        return BANNER + "Your friendly neighbourhood Peter, at your service!\n"
+                + "What can I swing by and help you with today?";
     }
 
     /**
@@ -54,7 +55,7 @@ public class Ui {
      * @return the farewell message
      */
     public String showGoodbye() {
-        return "Bye! See you next time.";
+        return "Catch you on the web-swing! Later, pal.";
     }
 
     /**
@@ -65,9 +66,9 @@ public class Ui {
      */
     public String showLoadingResult(int taskCount) {
         if (taskCount == 0) {
-            return "Peter dug around but found nothing - starting a fresh list.";
+            return "Web's empty - starting fresh with a clean strand.";
         }
-        return "Peter dug up " + taskCount + " task(s) from your old notes.";
+        return "Swung by the archive and pulled " + taskCount + " task(s) off the web.";
     }
 
     /**
@@ -76,7 +77,7 @@ public class Ui {
      * @return the loading error message
      */
     public String showLoadingError() {
-        return "Peter couldn't open the old notes, so he's starting fresh.";
+        return "My spidey-sense says that save file's a lost cause - starting fresh.";
     }
 
     /**
@@ -86,7 +87,7 @@ public class Ui {
      * @return the task list message
      */
     public String showTaskList(List<Task> tasks) {
-        String header = "Here are the tasks in your list:";
+        String header = "Here's everything currently stuck to the web:";
         if (tasks.isEmpty()) {
             return header;
         }
@@ -103,7 +104,7 @@ public class Ui {
      * @return the task-marked message
      */
     public String showTaskMarked(Task task) {
-        return "Good job on completing:\n  " + task;
+        return "Nice work, hero - that one's done:\n  " + task;
     }
 
     /**
@@ -113,7 +114,7 @@ public class Ui {
      * @return the task-unmarked message
      */
     public String showTaskUnmarked(Task task) {
-        return "OK, I've marked this task as not done yet:\n  " + task;
+        return "Gotcha, sticking that one back on the web as unfinished:\n  " + task;
     }
 
     /**
@@ -124,8 +125,8 @@ public class Ui {
      * @return the task-removed message
      */
     public String showTaskRemoved(Task task, int taskCount) {
-        return "Noted. I've removed this task:\n  " + task
-                + "\nNow you have " + taskCount + " tasks in the list.";
+        return "Snipped that one clean off the web:\n  " + task
+                + "\nThat's " + taskCount + " thing(s) left stuck to it.";
     }
 
     /**
@@ -136,8 +137,8 @@ public class Ui {
      * @return the task-added message
      */
     public String showTaskAdded(Task task, int taskCount) {
-        return "Got it. I've added this task:\n  " + task
-                + "\nNow you have " + taskCount + " tasks in the list.";
+        return "On it! Webbed that one up for you:\n  " + task
+                + "\nThat's " + taskCount + " thing(s) stuck to your web now.";
     }
 
     /**
@@ -150,12 +151,12 @@ public class Ui {
      */
     public String showSchedule(List<Task> scheduledTasks, LocalDate requestedDate) {
         if (scheduledTasks.isEmpty()) {
-            return "Peter checked and found no schedule for that day.";
+            return "Quiet day - nothing on the web for then.";
         }
         String lines = scheduledTasks.stream()
                 .map(task -> "  " + task)
                 .collect(Collectors.joining("\n"));
-        return "Here's your schedule for that day:\n" + lines;
+        return "Here's what's on the web for that day, deadlines first:\n" + lines;
     }
 
     /**
@@ -166,11 +167,11 @@ public class Ui {
      */
     public String showFoundTasks(List<Task> matchingTasks) {
         if (matchingTasks.isEmpty()) {
-            return "Peter searched high and low but found nothing matching that.";
+            return "Swung all over the city and came up empty on that search.";
         }
         String lines = IntStream.rangeClosed(1, matchingTasks.size())
                 .mapToObj(number -> number + "." + matchingTasks.get(number - 1))
                 .collect(Collectors.joining("\n"));
-        return "Here's what Peter dug up matching that:\n" + lines;
+        return "Here's what stuck to the web when I searched for that:\n" + lines;
     }
 }

@@ -172,7 +172,7 @@ public class Peter {
                 return ui.showFoundTasks(tasks.findTasks(keyword));
             }
             default:
-                throw new PeterException("I can't recognise that cus im not that developed yet, maybe next time");
+                throw new PeterException("Not even my spidey-sense can make sense of that one, pal. Try again?");
         }
     }
 

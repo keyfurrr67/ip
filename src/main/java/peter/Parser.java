@@ -15,6 +15,12 @@ public class Parser {
             DateTimeFormatter.ofPattern("yyyy-MM-dd HHmm");
     private static final DateTimeFormatter INPUT_DATE_FORMAT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final String MISSING_ARGUMENTS_MESSAGE =
+            "Whoa, my spidey-sense needs more than that to work with, pal.";
+    private static final String INVALID_DATE_MESSAGE =
+            "That date's got my spidey-sense all tangled - try yyyy-MM-dd.";
+    private static final String INVALID_DATE_TIME_MESSAGE =
+            "That date's got my spidey-sense all tangled - try yyyy-MM-dd or yyyy-MM-dd HHmm.";
 
     /**
      * Represents a raw line of input split into its command keyword and the
@@ -64,7 +70,7 @@ public class Parser {
     public static ParsedInput parseInput(String rawInput) throws PeterException {
         assert rawInput != null : "raw input should not be null";
         if (rawInput.isEmpty()) {
-            throw new PeterException("yea you're gonna have to give me more than that buddy.");
+            throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
         String keyword = rawInput.split(" ", 2)[0];
         String arguments = rawInput.length() > keyword.length()
@@ -81,7 +87,7 @@ public class Parser {
      */
     public static Todo parseTodo(String arguments) throws PeterException {
         if (arguments.isEmpty()) {
-            throw new PeterException("yea you're gonna have to give me more than that buddy.");
+            throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
         return new Todo(arguments);
     }
@@ -95,7 +101,7 @@ public class Parser {
      */
     public static String parseFindKeyword(String arguments) throws PeterException {
         if (arguments.isEmpty()) {
-            throw new PeterException("yea you're gonna have to give me more than that buddy.");
+            throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
         return arguments;
     }
@@ -110,13 +116,13 @@ public class Parser {
      */
     public static Deadline parseDeadline(String arguments) throws PeterException {
         if (arguments.isEmpty() || !arguments.contains("/by")) {
-            throw new PeterException("yea you're gonna have to give me more than that buddy.");
+            throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
         String[] parts = arguments.split("/by", 2);
         String description = parts[0].trim();
         String byText = parts[1].trim();
         if (description.isEmpty() || byText.isEmpty()) {
-            throw new PeterException("yea you're gonna have to give me more than that buddy.");
+            throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
         LocalDateTime by = parseUserDateTime(byText);
         return new Deadline(description, by);
@@ -132,7 +138,7 @@ public class Parser {
      */
     public static Event parseEvent(String arguments) throws PeterException {
         if (arguments.isEmpty() || !arguments.contains("/from") || !arguments.contains("/to")) {
-            throw new PeterException("yea you're gonna have to give me more than that buddy.");
+            throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
         String[] fromParts = arguments.split("/from", 2);
         String description = fromParts[0].trim();
@@ -140,7 +146,7 @@ public class Parser {
         String fromText = toParts[0].trim();
         String toText = toParts.length > 1 ? toParts[1].trim() : "";
         if (description.isEmpty() || fromText.isEmpty() || toText.isEmpty()) {
-            throw new PeterException("yea you're gonna have to give me more than that buddy.");
+            throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
         LocalDateTime from = parseUserDateTime(fromText);
         LocalDateTime to = parseUserDateTime(toText);
@@ -157,12 +163,12 @@ public class Parser {
      */
     public static int parseTaskIndex(String arguments) throws PeterException {
         if (arguments.isEmpty()) {
-            throw new PeterException("yea you're gonna have to give me more than that buddy.");
+            throw new PeterException(MISSING_ARGUMENTS_MESSAGE);
         }
         try {
             return Integer.parseInt(arguments) - 1;
         } catch (NumberFormatException exception) {
-            throw new PeterException("that's not a number my guy.");
+            throw new PeterException("That's not a number, bud - try again?");
         }
     }
 
@@ -177,7 +183,7 @@ public class Parser {
         try {
             return LocalDate.parse(arguments, INPUT_DATE_FORMAT);
         } catch (DateTimeParseException exception) {
-            throw new PeterException("that date's not making sense to me buddy, try yyyy-MM-dd.");
+            throw new PeterException(INVALID_DATE_MESSAGE);
         }
     }
 
@@ -195,8 +201,7 @@ public class Parser {
             }
             return LocalDateTime.parse(dateTimeText, INPUT_DATE_TIME_FORMAT);
         } catch (DateTimeParseException exception) {
-            throw new PeterException("that date's not making sense to me buddy, try yyyy-MM-dd or "
-                    + "yyyy-MM-dd HHmm.");
+            throw new PeterException(INVALID_DATE_TIME_MESSAGE);
         }
     }
 }
